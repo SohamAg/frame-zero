@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
@@ -14,6 +15,35 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     private Vector2 moveInput;
     private bool jumpPressed;
     private bool isGrounded;
+    public GameObject winText;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Lava"))
+        {
+            Debug.Log("Player touched lava!");
+
+            // Example: Reset position
+            transform.position = new Vector3(0f, 2.5f, 0f);
+
+            // Reset velocity
+            rb.linearVelocity = Vector3.zero;
+        }
+
+        if (other.CompareTag("Winning"))
+        {
+            WinGame();
+        }
+    }
+
+    void WinGame()
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.isKinematic = true;
+        enabled = false;
+        Debug.Log("LMAO");
+        winText.SetActive(true);
+    }
 
     void Awake()
     {

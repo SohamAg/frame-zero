@@ -7,6 +7,8 @@ TagManager:
   - Wood
   - Hazard
   - Ground
+  - Lava
+  - Winning
   layers:
   - Default
   - TransparentFX
