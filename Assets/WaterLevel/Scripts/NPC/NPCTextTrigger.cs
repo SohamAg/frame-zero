@@ -23,7 +23,7 @@ public class NPCTextTrigger : MonoBehaviour
         inventory = FindObjectOfType<InventoryManager>();
 
         // Find WinCanvas in the scene
-        winCanvas = GameObject.Find("WinCanvas"); // Make sure your Canvas is named exactly "WinCanvas"
+        winCanvas = GameObject.Find("WinCanvas");
         if (winCanvas != null)
             winCanvas.SetActive(false); // Hide it at start
     }
@@ -33,7 +33,7 @@ public class NPCTextTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             canvasToDisplay.SetActive(true);
-            questionText.text = "Hello traveller! How can I be of assistance?";
+            questionText.text = "Wizard: Hello traveller! How can I be of assistance?";
         }
     }
 
@@ -48,13 +48,13 @@ public class NPCTextTrigger : MonoBehaviour
     // OPTION 1
     public void SayHi()
     {
-        questionText.text = "Well hello to you too! Safe travels.";
+        questionText.text = "Wizard: Well hello to you too! Safe travels.";
     }
 
     // OPTION 2
     public void LearnPowers()
     {
-        questionText.text = "To obtain my powers, you must brew a potion using three rare items.";
+        questionText.text = "Wizard: To obtain my powers, you must brew a potion using three rare items.";
     }
 
     // OPTION 3 — Give Items
@@ -66,7 +66,7 @@ public class NPCTextTrigger : MonoBehaviour
             inventory.RemoveItems("Fish", 3);
 
             // Give potion
-            questionText.text = "Ah! You have everything I need. Here is your potion!";
+            questionText.text = "Wizard: Ah! You have everything I need. Here is your potion!";
 
             inventory.AddItem("Potion");
 
@@ -79,13 +79,13 @@ public class NPCTextTrigger : MonoBehaviour
                 CrystalPickup cp = crystal.GetComponent<CrystalPickup>();
                 if (cp != null)
                 {
-                    cp.winCanvas = winCanvas; // assign canvas at runtime
+                    cp.winCanvas = winCanvas;
                 }
             }
         }
         else
         {
-            questionText.text = "You don’t have enough fish yet!";
+            questionText.text = "Wizard: You don’t have enough fish yet!";
         }
     }
 }
