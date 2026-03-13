@@ -132,26 +132,25 @@ public class TimeController : MonoBehaviour
     private void EndGame()
     {
         gameEnded = true;
-
-        Debug.Log("Game Over: The sun has set!");
+        Time.timeScale = 0f; // Freeze game
 
         if (gameOverCanvas != null)
             gameOverCanvas.SetActive(true);
 
-        Time.timeScale = 0f; // freezes the game
+        Debug.Log("Game Over: The sun has set + 1 hour!");
     }
     private void CheckForGameOver()
-{
-    // Add 1 hour to sunset
-    TimeSpan gameOverTime = sunsetTime + TimeSpan.FromHours(1);
-
-    // Wrap around if it exceeds 24h
-    if (gameOverTime.TotalHours >= 24)
-        gameOverTime -= TimeSpan.FromHours(24);
-
-    if (currentTime.TimeOfDay >= gameOverTime && !gameEnded)
     {
-        EndGame();
+        // Add 1 hour to sunset
+        TimeSpan gameOverTime = sunsetTime + TimeSpan.FromHours(1);
+
+        // Wrap around if it exceeds 24h
+        if (gameOverTime.TotalHours >= 24)
+            gameOverTime -= TimeSpan.FromHours(24);
+
+        if (currentTime.TimeOfDay >= gameOverTime && !gameEnded)
+        {
+            EndGame();
+        }
     }
-}
 }
