@@ -8,17 +8,8 @@ public class CameraFollower : MonoBehaviour
 
     void LateUpdate()
     {
-        // Prevent MissingReferenceException
-        if (target == null)
-            return;
-
         Vector3 desiredPosition = target.position + target.TransformDirection(offset);
-
-        transform.position = Vector3.Lerp(
-            transform.position,
-            desiredPosition,
-            smoothSpeed * Time.deltaTime
-        );
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
 
         transform.LookAt(target.position + Vector3.up * 1.5f);
     }

@@ -44,6 +44,6 @@ public class GamePauseMenu : MonoBehaviour
     public void ExitToMap()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMapLevel"); // placeholder name
+        SceneManager.LoadScene("WorldMap"); // placeholder name
     }
 }

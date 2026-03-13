@@ -75,6 +75,13 @@ public class FishSwim : MonoBehaviour
 
             Debug.Log("Fish collected!");
 
+            // Add fish to inventory
+            InventoryManager inv = FindObjectOfType<InventoryManager>();
+            if (inv != null)
+            {
+                inv.AddItem("Fish");
+            }
+
             gameObject.SetActive(false);
         }
     }

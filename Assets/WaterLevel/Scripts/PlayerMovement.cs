@@ -5,7 +5,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float speed = 6f;
-    public float rotationSmoothTime = 0.1f; // Lower = snappier, higher = smoother
+    public float rotationSmoothTime = 0.1f;
 
     [Header("Gravity Settings")]
     public float gravity = -9.81f;
