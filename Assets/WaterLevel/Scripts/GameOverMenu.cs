@@ -3,18 +3,47 @@ using UnityEngine.SceneManagement;
 
 public class GameOverMenu : MonoBehaviour
 {
-    // Call this for the Restart button
+    public GameObject menuCanvas;
+
+    private bool menuOpen = false;
+
+    void Start()
+    {
+        // Hide the menu when the game starts
+        menuCanvas.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleMenu();
+        }
+    }
+
+    public void ToggleMenu()
+    {
+        menuOpen = !menuOpen;
+
+        menuCanvas.SetActive(menuOpen);
+
+        if (menuOpen)
+            Time.timeScale = 0f; // pause
+        else
+            Time.timeScale = 1f; // resume
+    }
+
     public void RestartLevel()
     {
-        Time.timeScale = 1f; // reset time scale
+        Time.timeScale = 1f;
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.name);
     }
 
-    // Call this for the Exit to Map button
     public void ExitToMap()
     {
-        Time.timeScale = 1f; // reset time scale
-        SceneManager.LoadScene("MapLevel"); // Replace with your actual map scene name
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMapLevel"); // placeholder name
     }
 }
