@@ -4,7 +4,7 @@ using TMPro;
 
 public class InventoryManager : MonoBehaviour
 {
-    public TMP_Text inventoryText; // Assign InventoryText here
+    public TMP_Text inventoryText;
 
     private List<string> items = new List<string>();
 
@@ -13,14 +13,31 @@ public class InventoryManager : MonoBehaviour
         UpdateUI();
     }
 
-    // Call this to add an item
     public void AddItem(string itemName)
     {
         items.Add(itemName);
         UpdateUI();
     }
 
-    // Refresh the UI
+    public int GetItemCount(string itemName)
+    {
+        int count = 0;
+        foreach (var item in items)
+        {
+            if (item == itemName) count++;
+        }
+        return count;
+    }
+
+    public void RemoveItems(string itemName, int quantity)
+    {
+        for (int i = 0; i < quantity; i++)
+        {
+            items.Remove(itemName);
+        }
+        UpdateUI();
+    }
+
     void UpdateUI()
     {
         if (inventoryText == null) return;
