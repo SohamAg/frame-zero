@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameOverMenu : MonoBehaviour
+public class GamePauseMenu : MonoBehaviour
 {
     public GameObject menuCanvas;
 
