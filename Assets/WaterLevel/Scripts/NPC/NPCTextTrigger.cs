@@ -8,12 +8,24 @@ public class NPCTextTrigger : MonoBehaviour
 
     private InventoryManager inventory;
 
+    // Crystal spawning
+    public GameObject crystalPrefab;
+    public Transform crystalSpawnPoint;
+
+    // Win Canvas
+    private GameObject winCanvas;
+
     void Start()
     {
         if (canvasToDisplay != null)
             canvasToDisplay.SetActive(false);
 
         inventory = FindObjectOfType<InventoryManager>();
+
+        // Find WinCanvas in the scene
+        winCanvas = GameObject.Find("WinCanvas"); // Make sure your Canvas is named exactly "WinCanvas"
+        if (winCanvas != null)
+            winCanvas.SetActive(false); // Hide it at start
     }
 
     private void OnTriggerEnter(Collider other)
@@ -53,11 +65,23 @@ public class NPCTextTrigger : MonoBehaviour
             // Remove 3 fish
             inventory.RemoveItems("Fish", 3);
 
-            // Give potion (could be just a message, or add a potion item)
+            // Give potion
             questionText.text = "Ah! You have everything I need. Here is your potion!";
-            
-            // Optional: Add Potion to inventory
+
             inventory.AddItem("Potion");
+
+            // Spawn crystal at spawn point
+            if (crystalPrefab != null && crystalSpawnPoint != null)
+            {
+                GameObject crystal = Instantiate(crystalPrefab, crystalSpawnPoint.position, Quaternion.identity);
+
+                // Assign WinCanvas dynamically
+                CrystalPickup cp = crystal.GetComponent<CrystalPickup>();
+                if (cp != null)
+                {
+                    cp.winCanvas = winCanvas; // assign canvas at runtime
+                }
+            }
         }
         else
         {
