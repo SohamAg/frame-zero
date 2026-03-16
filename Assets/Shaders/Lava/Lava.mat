@@ -75,7 +75,7 @@ Material:
     - _Metallic: 0
     - _NoiseAmount: 1
     - _NoiseScale: 30
-    - _Normal_Strength: 20
+    - _Normal_Strength: 100
     - _Power: 2
     - _QueueControl: 0
     - _QueueOffset: 0
