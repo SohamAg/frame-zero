@@ -47,13 +47,28 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     void Awake()
     {
+        Debug.Log("Awake ran");
         inputActions = new InputSystem_Actions();
         inputActions.Player.SetCallbacks(this);
     }
 
     void OnEnable()
     {
+        Debug.Log("OnEnable ran");
         inputActions.Player.Enable();
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+        Debug.Log("OnMove fired: " + moveInput + " | phase: " + context.phase);
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        Debug.Log("OnJump fired: " + context.phase);
+        if (context.performed)
+            jumpPressed = true;
     }
 
     void OnDisable()
@@ -115,16 +130,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     // === INPUT CALLBACKS ===
 
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        moveInput = context.ReadValue<Vector2>();
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-            jumpPressed = true;
-    }
 
     // Unused but required by interface
     public void OnLook(InputAction.CallbackContext context) { }
