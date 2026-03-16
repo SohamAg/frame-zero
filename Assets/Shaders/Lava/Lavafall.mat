@@ -62,7 +62,7 @@ Material:
     - _QueueOffset: 0
     - _Smoke_Int: 1
     - _Smoothness: 0
-    - _VoronoiAO: 2
+    - _VoronoiAO: 3
     - _VoronoiAmount: 0.05
     - _VoronoiScale: 5
     m_Colors:
