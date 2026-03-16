@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         {
             Debug.Log("Player touched lava!");
 
-            transform.position = new Vector3(0f, 2.5f, 0f);
+            transform.position = new Vector3(95.1f, 2.5f, 164.9f);
             rb.linearVelocity = Vector3.zero;
         }
 
