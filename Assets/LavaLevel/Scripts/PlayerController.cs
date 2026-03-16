@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     private Rigidbody rb;
     private Transform cam;
+    private Animator animator;
     private InputSystem_Actions inputActions;
 
     private Vector2 moveInput;
@@ -23,10 +24,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         {
             Debug.Log("Player touched lava!");
 
-            // Example: Reset position
             transform.position = new Vector3(0f, 2.5f, 0f);
-
-            // Reset velocity
             rb.linearVelocity = Vector3.zero;
         }
 
@@ -80,6 +78,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     {
         rb = GetComponent<Rigidbody>();
         cam = Camera.main.transform;
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -107,6 +106,12 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         Vector3 velocity = moveDirection * moveSpeed;
         velocity.y = rb.linearVelocity.y;
         rb.linearVelocity = velocity;
+
+        if (animator != null)
+        {
+            float speed = moveDirection.magnitude;
+            animator.SetFloat("Speed", speed);
+        }
     }
 
     void HandleJump()
@@ -128,10 +133,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         }
     }
 
-    // === INPUT CALLBACKS ===
-
-
-    // Unused but required by interface
     public void OnLook(InputAction.CallbackContext context) { }
     public void OnAttack(InputAction.CallbackContext context) { }
     public void OnInteract(InputAction.CallbackContext context) { }
