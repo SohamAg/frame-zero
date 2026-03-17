@@ -38,7 +38,6 @@ public class PlayerMovement : MonoBehaviour
 
         if (inputDir.magnitude >= 0.1f)
         {
-            // Convert input to camera-relative direction
             float targetAngle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg + cameraTransform.eulerAngles.y;
             currentAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref angleVelocity, rotationSmoothTime);
             transform.rotation = Quaternion.Euler(0f, currentAngle, 0f);
@@ -52,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (controller.isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f; // keep grounded
+            velocity.y = -2f;
         }
 
         velocity.y += gravity * Time.deltaTime;

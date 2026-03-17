@@ -9,7 +9,6 @@ public class GamePauseMenu : MonoBehaviour
 
     void Start()
     {
-        // Hide the menu when the game starts
         menuCanvas.SetActive(false);
         Time.timeScale = 1f;
     }
@@ -29,9 +28,9 @@ public class GamePauseMenu : MonoBehaviour
         menuCanvas.SetActive(menuOpen);
 
         if (menuOpen)
-            Time.timeScale = 0f; // pause
+            Time.timeScale = 0f;
         else
-            Time.timeScale = 1f; // resume
+            Time.timeScale = 1f; 
     }
 
     public void RestartLevel()
@@ -44,6 +43,6 @@ public class GamePauseMenu : MonoBehaviour
     public void ExitToMap()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("WorldMap"); // placeholder name
+        SceneManager.LoadScene("WorldMap");
     }
 }

@@ -45,19 +45,19 @@ public class NPCTextTrigger : MonoBehaviour
         }
     }
 
-    // OPTION 1
+    // hello
     public void SayHi()
     {
         questionText.text = "Wizard: Well hello to you too! Safe travels.";
     }
 
-    // OPTION 2
+    // teach
     public void LearnPowers()
     {
         questionText.text = "Wizard: To obtain my powers, you must brew a potion using three rare items.";
     }
 
-    // OPTION 3 — Give Items
+    // give
     public void GiveItems()
     {
         if (inventory != null && inventory.GetItemCount("Fish") >= 3)
@@ -75,7 +75,6 @@ public class NPCTextTrigger : MonoBehaviour
             {
                 GameObject crystal = Instantiate(crystalPrefab, crystalSpawnPoint.position, Quaternion.identity);
 
-                // Assign WinCanvas dynamically
                 CrystalPickup cp = crystal.GetComponent<CrystalPickup>();
                 if (cp != null)
                 {
