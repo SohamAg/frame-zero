@@ -137,7 +137,7 @@ public class TimeController : MonoBehaviour
         if (gameOverCanvas != null)
             gameOverCanvas.SetActive(true);
 
-        Debug.Log("Game Over: The sun has set + 1 hour!");
+        Debug.Log("Game Over: It is night!");
     }
     private void CheckForGameOver()
     {
