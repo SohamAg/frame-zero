@@ -4,18 +4,27 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
+    [Header("Movement")]
     public float moveSpeed = 6f;
     public float jumpForce = 7f;
     public float rotationSpeed = 10f;
+    public int maxJumps = 2;
+
+    [Header("Audio")]
+    public AudioClip jumpClip;
+    [Range(0f, 1f)] public float jumpVolume = 1f;
 
     private Rigidbody rb;
     private Transform cam;
     private Animator animator;
+    private AudioSource audioSource;
     private InputSystem_Actions inputActions;
 
     private Vector2 moveInput;
     private bool jumpPressed;
     private bool isGrounded;
+    private int jumpsRemaining;
+
     public GameObject winText;
 
     private void OnTriggerEnter(Collider other)
@@ -56,19 +65,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         inputActions.Player.Enable();
     }
 
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        moveInput = context.ReadValue<Vector2>();
-        Debug.Log("OnMove fired: " + moveInput + " | phase: " + context.phase);
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        Debug.Log("OnJump fired: " + context.phase);
-        if (context.performed)
-            jumpPressed = true;
-    }
-
     void OnDisable()
     {
         inputActions.Player.Disable();
@@ -78,13 +74,30 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     {
         rb = GetComponent<Rigidbody>();
         cam = Camera.main.transform;
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
+        audioSource = GetComponent<AudioSource>();
+
+        jumpsRemaining = maxJumps;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         HandleMovement();
         HandleJump();
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+        Debug.Log("OnMove fired: " + moveInput + " | phase: " + context.phase);
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        Debug.Log("OnJump fired: " + context.phase);
+
+        if (context.performed)
+            jumpPressed = true;
     }
 
     void HandleMovement()
@@ -92,15 +105,22 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         Vector3 forward = cam.forward;
         Vector3 right = cam.right;
 
-        forward.y = 0;
-        right.y = 0;
+        forward.y = 0f;
+        right.y = 0f;
+
+        forward.Normalize();
+        right.Normalize();
 
         Vector3 moveDirection = (forward * moveInput.y + right * moveInput.x).normalized;
 
         if (moveDirection.magnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                rotationSpeed * Time.fixedDeltaTime
+            );
         }
 
         Vector3 velocity = moveDirection * moveSpeed;
@@ -109,17 +129,35 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
         if (animator != null)
         {
-            float speed = moveDirection.magnitude;
-            animator.SetFloat("Speed", speed);
+            animator.SetFloat("Speed", moveDirection.magnitude);
+            animator.SetBool("IsGrounded", isGrounded);
         }
     }
 
     void HandleJump()
     {
-        if (jumpPressed && isGrounded)
+        if (jumpPressed && jumpsRemaining > 0)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            jumpsRemaining--;
             isGrounded = false;
+
+            if (animator != null)
+            {
+                animator.ResetTrigger("Jump");
+                animator.SetTrigger("Jump");
+                animator.SetBool("IsGrounded", false);
+
+                // Restart the Jump animation immediately
+                animator.Play("Jump", 0, 0f);
+            }
+
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+            if (audioSource != null && jumpClip != null)
+            {
+                audioSource.PlayOneShot(jumpClip, jumpVolume);
+            }
         }
 
         jumpPressed = false;
@@ -129,7 +167,19 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGrounded = true;
+            if (!isGrounded)
+            {
+                isGrounded = true;
+                jumpsRemaining = maxJumps;
+            }
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
         }
     }
 
