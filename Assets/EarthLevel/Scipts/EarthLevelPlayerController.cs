@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement; // Added for restarting on death
 
 public class EarthLevelPlayerController : MonoBehaviour
 {
-    public float speed = 10f; // Using a lower value with linearVelocity is usually more stable
+    public float speed; // Using a lower value with linearVelocity is usually more stable
     public Text statusText;
     
     [Header("Alpha Objects")]
@@ -22,6 +22,7 @@ public class EarthLevelPlayerController : MonoBehaviour
 
     void Start()
     {
+        speed = 15f;
         rb = GetComponent<Rigidbody>();
         playerAudio = GetComponent<AudioSource>();
         
