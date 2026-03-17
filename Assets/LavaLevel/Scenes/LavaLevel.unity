@@ -6038,10 +6038,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1724207113}
   m_SourcePrefab: {fileID: 100100000, guid: 4e63dfed9b9057c4cb3e9fada2225efa, type: 3}
-<<<<<<< HEAD
---- !u!1 &2102870623
-GameObject:
-=======
 --- !u!1 &2136243494 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8703780553228900802, guid: 4e63dfed9b9057c4cb3e9fada2225efa, type: 3}
@@ -6049,52 +6045,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!65 &2136243495
 BoxCollider:
->>>>>>> level/lava
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< HEAD
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2102870625}
-  - component: {fileID: 2102870624}
-  m_Layer: 0
-  m_Name: LevelTester
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2102870624
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2102870623}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f2f707c04d1e4399b83a86a7912fd21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelType: 0
---- !u!4 &2102870625
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2102870623}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.9893246, y: 4.632169, z: -3.6916847}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-=======
   m_GameObject: {fileID: 2136243494}
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -6110,7 +6064,6 @@ Transform:
   serializedVersion: 3
   m_Size: {x: 0.026582463, y: 0.02900362, z: 0.029857984}
   m_Center: {x: 0.00058984663, y: -0.0011738276, z: 0.00070047524}
->>>>>>> level/lava
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -6152,10 +6105,6 @@ SceneRoots:
   - {fileID: 1354416758}
   - {fileID: 2013737102}
   - {fileID: 2068729614}
-<<<<<<< HEAD
-  - {fileID: 1105577052}
-  - {fileID: 2102870625}
-=======
   - {fileID: 1868218686}
   - {fileID: 1371728834}
   - {fileID: 1267649152}
@@ -6163,4 +6112,3 @@ SceneRoots:
   - {fileID: 589594120}
   - {fileID: 1495429727}
   - {fileID: 1228364843}
->>>>>>> level/lava
