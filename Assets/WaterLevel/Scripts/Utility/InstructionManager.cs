@@ -26,8 +26,5 @@ public class InstructionsManager : MonoBehaviour
 
         if (instructionsPanel != null)
             instructionsPanel.SetActive(false); // Hide instructions
-
-        // Optional: unlock player movement if you had it disabled
-        // Example: PlayerMovement.enabled = true;
     }
 }
