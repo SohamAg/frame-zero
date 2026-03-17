@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     public float rotationSpeed = 10f;
     public int maxJumps = 2;
 
+
+
     [Header("Audio")]
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 1f;
@@ -138,6 +140,8 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     {
         if (jumpPressed && jumpsRemaining > 0)
         {
+            Debug.Log("Jump logic entered");
+
             jumpsRemaining--;
             isGrounded = false;
 
@@ -146,16 +150,33 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
                 animator.ResetTrigger("Jump");
                 animator.SetTrigger("Jump");
                 animator.SetBool("IsGrounded", false);
-
-                // Restart the Jump animation immediately
                 animator.Play("Jump", 0, 0f);
             }
 
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
+            if (audioSource == null)
+            {
+                Debug.Log("audioSource is NULL");
+            }
+            else
+            {
+                Debug.Log("audioSource found");
+            }
+
+            if (jumpClip == null)
+            {
+                Debug.Log("jumpClip is NULL");
+            }
+            else
+            {
+                Debug.Log("jumpClip found: " + jumpClip.name);
+            }
+
             if (audioSource != null && jumpClip != null)
             {
+                Debug.Log("Playing jump sound now");
                 audioSource.PlayOneShot(jumpClip, jumpVolume);
             }
         }
