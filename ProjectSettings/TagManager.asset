@@ -9,6 +9,9 @@ TagManager:
   - Ground
   - Lava
   - Winning
+  - Altar
+  - Crystal
+  - Enemy
   layers:
   - Default
   - TransparentFX
