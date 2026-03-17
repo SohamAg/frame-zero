@@ -9,7 +9,7 @@ public class InstructionsManager : MonoBehaviour
     void Start()
     {
         if (instructionsPanel != null)
-            instructionsPanel.SetActive(true); // Show at start
+            instructionsPanel.SetActive(true); 
     }
 
     void Update()
@@ -25,6 +25,6 @@ public class InstructionsManager : MonoBehaviour
         gameStarted = true;
 
         if (instructionsPanel != null)
-            instructionsPanel.SetActive(false); // Hide instructions
+            instructionsPanel.SetActive(false); 
     }
 }

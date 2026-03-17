@@ -4,7 +4,6 @@ public class CrystalPickup : MonoBehaviour
 {
     private bool collected = false;
 
-    // Make this public so other scripts can assign it
     public GameObject winCanvas;
 
     void Start()
@@ -24,10 +23,10 @@ public class CrystalPickup : MonoBehaviour
             if (winCanvas != null)
                 winCanvas.SetActive(true); // Show Win Canvas
 
-            Time.timeScale = 0f; // Freeze game
+            Time.timeScale = 0f;
             gameObject.SetActive(false);
 
-            Debug.Log("Congratulations! You collected the crystal and won the game!");
+            Debug.Log("Congratulations! You collected the crystal and won the level!");
         }
     }
 }
