@@ -3,7 +3,7 @@ using UnityEngine;
 public class RootEnemy : MonoBehaviour
 {
     public Transform player;
-    public float speed = 5f;
+    public float speed = 10f;
 
     void Update()
     {
