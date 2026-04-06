@@ -17,15 +17,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/EarthLevel.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/WaterLevel.unity
     guid: 78ea98a2063da4fffb20519c9a5dad8d
   - enabled: 1
     path: Assets/Scenes/BossLevel.unity
     guid: b998e280686a8434297286c8a437d916
-  - enabled: 0
+  - enabled: 1
     path: Assets/LavaLevel/Scenes/LavaLevel.unity
     guid: 70fb646f0ac2dc047b7af1300c28856d
+  - enabled: 1
+    path: Assets/WaterLevel/Scenes/WaterLevel.unity
+    guid: d1a5965b13e00487fa74ed468c2cfe27
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
