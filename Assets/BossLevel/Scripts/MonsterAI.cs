@@ -35,6 +35,10 @@ public class MonsterAI : MonoBehaviour
         {
             Attack();
         }
+
+        
+        float speed = agent.velocity.magnitude;
+        animator.SetFloat("Speed", speed);
     }
 
     void Idle()
@@ -54,7 +58,29 @@ public class MonsterAI : MonoBehaviour
     void Attack()
     {
         agent.SetDestination(transform.position);
-        animator.SetBool("isWalking", false);
-        animator.SetBool("isAttacking", true);
+        animator.SetFloat("Speed", 0);
+        animator.SetTrigger("Attack"); // better than bool
+    }
+
+    public int health = 100;
+    public GameObject levelCompleteCanvas;
+
+    void TakeDamage(int damage)
+    {
+        health -= damage;
+
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        // disable monster
+        gameObject.SetActive(false);
+
+        // show UI
+        levelCompleteCanvas.SetActive(true);
     }
 }
