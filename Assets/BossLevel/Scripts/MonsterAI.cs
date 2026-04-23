@@ -11,6 +11,9 @@ public class MonsterAI : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
 
+    public GameObject levelCompleteCanvas;
+    public int health = 100;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -21,55 +24,60 @@ public class MonsterAI : MonoBehaviour
 
     void Update()
     {
+        if (player == null) return;
+
         float distance = Vector3.Distance(transform.position, player.position);
 
         if (distance > sightRange)
         {
             Idle();
         }
-        else if (distance <= sightRange && distance > attackRange)
+        else if (distance > attackRange)
         {
             Chase();
         }
-        else if (distance <= attackRange)
+        else
         {
             Attack();
         }
 
-        
-        float speed = agent.velocity.magnitude;
-        animator.SetFloat("Speed", speed);
+        animator.SetFloat("Speed", agent.velocity.magnitude);
     }
 
     void Idle()
     {
         agent.SetDestination(transform.position);
-        animator.SetBool("isWalking", false);
-        animator.SetBool("isAttacking", false);
     }
 
     void Chase()
     {
         agent.SetDestination(player.position);
-        animator.SetBool("isWalking", true);
-        animator.SetBool("isAttacking", false);
     }
 
     void Attack()
     {
         agent.SetDestination(transform.position);
-        animator.SetFloat("Speed", 0);
-        animator.SetTrigger("Attack"); // better than bool
+        animator.SetTrigger("Attack");
+
+        // attempt damage (will only work in hit window)
+        GetComponent<MonsterAttack>().TryDealDamage();
     }
 
-    public int health = 100;
-    public GameObject levelCompleteCanvas;
-
-    void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         health -= damage;
 
-        if (health <= 0)
+        // random hit reaction
+        int hitType = Random.Range(1, 3);
+
+        if (health > 0)
+        {
+            if (hitType == 1)
+                animator.SetTrigger("Hit1");
+            else
+                animator.SetTrigger("Hit2");
+        }
+        else
         {
             Die();
         }
@@ -77,10 +85,12 @@ public class MonsterAI : MonoBehaviour
 
     void Die()
     {
-        // disable monster
-        gameObject.SetActive(false);
+        animator.SetTrigger("Die");
+        agent.enabled = false;
 
-        // show UI
-        levelCompleteCanvas.SetActive(true);
+        if (levelCompleteCanvas != null)
+            levelCompleteCanvas.SetActive(true);
+
+        gameObject.SetActive(false);
     }
 }
