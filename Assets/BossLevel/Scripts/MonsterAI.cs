@@ -42,6 +42,11 @@ public class MonsterAI : MonoBehaviour
         }
 
         animator.SetFloat("Speed", agent.velocity.magnitude);
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+           GetComponent<MonsterAttack>().DealDamage();
+        }
     }
 
     void Idle()
@@ -60,7 +65,7 @@ public class MonsterAI : MonoBehaviour
         animator.SetTrigger("Attack");
 
         // attempt damage (will only work in hit window)
-        GetComponent<MonsterAttack>().TryDealDamage();
+        GetComponent<MonsterAttack>().DealDamage();
     }
 
     public void TakeDamage(int damage)
@@ -93,4 +98,7 @@ public class MonsterAI : MonoBehaviour
 
         gameObject.SetActive(false);
     }
+
+    
+    
 }

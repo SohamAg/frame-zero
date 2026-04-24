@@ -2,59 +2,33 @@ using UnityEngine;
 
 public class MonsterAttack : MonoBehaviour
 {
-    public int damage = 20;
+    public int damage = 5;
+    public float attackCooldown = 1.2f;
 
     private PlayerHealth playerHealth;
-    private Animator animator;
-
-    public float damageDelay = 0.4f; // when hit happens in animation
-    public float damageWindow = 0.2f;
-
-    private bool canDealDamage = false;
+    private float lastAttackTime;
 
     void Start()
     {
-        animator = GetComponent<Animator>();
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
 
-        playerHealth = GameObject.FindGameObjectWithTag("Player")
-            .GetComponent<PlayerHealth>();
-    }
-
-    void Update()
-    {
-        // Detect if ANY attack animation is playing
-        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-
-        if (state.IsTag("Attack"))
+        if (player != null)
         {
-            // simple timing window
-            float normalizedTime = state.normalizedTime;
-
-            if (normalizedTime >= damageDelay && normalizedTime <= damageDelay + damageWindow)
-            {
-                canDealDamage = true;
-            }
-            else
-            {
-                canDealDamage = false;
-            }
-        }
-        else
-        {
-            canDealDamage = false;
+            playerHealth = player.GetComponent<PlayerHealth>();
         }
     }
 
-    public void TryDealDamage()
+    public void DealDamage()
     {
-        if (!canDealDamage) return;
+        if (Time.time < lastAttackTime + attackCooldown)
+            return;
 
-        if (playerHealth != null)
-        {
-            playerHealth.TakeDamage(damage);
-        }
+        if (playerHealth == null) return;
 
-        // prevent multi-hit spam
-        canDealDamage = false;
+        Debug.Log("Damage dealt: " + damage);
+
+        playerHealth.TakeDamage(damage);
+
+        lastAttackTime = Time.time;
     }
 }
