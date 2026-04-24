@@ -39,8 +39,6 @@ public class PlayerHealth : MonoBehaviour
     {
         Debug.Log("Player Dead");
 
-        // Optional: disable movement, play animation, etc.
-        // GetComponent<PlayerMovement>().enabled = false;
-        // GetComponent<Animator>().SetTrigger("Die");
+        // add animation for death?
     }
 }

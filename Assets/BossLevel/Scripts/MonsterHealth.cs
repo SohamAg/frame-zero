@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MonsterHealth : MonoBehaviour
 {
@@ -7,15 +8,28 @@ public class MonsterHealth : MonoBehaviour
 
     private Animator animator;
 
+    public Slider healthBar;
+
     void Start()
     {
         currentHealth = maxHealth;
         animator = GetComponent<Animator>();
+
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+        }
     }
 
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
+
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth;
+        }
 
         if (currentHealth <= 0)
         {
