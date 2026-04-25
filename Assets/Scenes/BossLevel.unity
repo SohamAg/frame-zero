@@ -735,6 +735,7 @@ GameObject:
   - component: {fileID: 311459975}
   - component: {fileID: 311459981}
   - component: {fileID: 311459982}
+  - component: {fileID: 311459983}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -886,7 +887,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 100
-  healthBar: {fileID: 1152529130}
+  potionHeal: 20
 --- !u!114 &311459982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,6 +907,19 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 8
+--- !u!114 &311459983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311459974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c9beca38e6b489d9bc7efcdc209f01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDefending: 0
 --- !u!1 &323266751 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1342959200176554030, guid: 71c2b86e4d7bc49b894c67d7b7a7b83f, type: 3}
