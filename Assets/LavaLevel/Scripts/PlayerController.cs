@@ -10,99 +10,73 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     public float rotationSpeed = 10f;
     public int maxJumps = 2;
 
-
-
     [Header("Audio")]
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 1f;
 
+    [Header("UI")]
+    public GameObject winText;
+
     private Rigidbody rb;
     private Transform cam;
-    private Animator animator;
+    [SerializeField] private Animator animator;
     private AudioSource audioSource;
     private InputSystem_Actions inputActions;
 
     private Vector2 moveInput;
     private bool jumpPressed;
     private bool isGrounded;
+    private bool isBlocking;
     private int jumpsRemaining;
 
-    public GameObject winText;
+    private static readonly int MoveXHash = Animator.StringToHash("MoveX");
+    private static readonly int MoveYHash = Animator.StringToHash("MoveY");
+    private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
+    private static readonly int IsBlockingHash = Animator.StringToHash("IsBlocking");
+    private static readonly int JumpHash = Animator.StringToHash("Jump");
+    private static readonly int AttackHash = Animator.StringToHash("Attack");
+    private static readonly int CastSpellHash = Animator.StringToHash("CastSpell");
 
-    private void OnTriggerEnter(Collider other)
+    private void Awake()
     {
-        if (other.CompareTag("Lava"))
-        {
-            Debug.Log("Player touched lava!");
-
-            transform.position = new Vector3(95.1f, 2.5f, 164.9f);
-            rb.linearVelocity = Vector3.zero;
-        }
-
-        if (other.CompareTag("Winning"))
-        {
-            WinGame();
-        }
-    }
-
-    void WinGame()
-    {
-        rb.linearVelocity = Vector3.zero;
-        rb.isKinematic = true;
-        enabled = false;
-        Debug.Log("LMAO");
-        winText.SetActive(true);
-    }
-
-    void Awake()
-    {
-        Debug.Log("Awake ran");
         inputActions = new InputSystem_Actions();
         inputActions.Player.SetCallbacks(this);
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
-        Debug.Log("OnEnable ran");
         inputActions.Player.Enable();
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         inputActions.Player.Disable();
     }
 
-    void Start()
+    private void Start()
     {
+
         rb = GetComponent<Rigidbody>();
         cam = Camera.main.transform;
-        animator = GetComponentInChildren<Animator>();
+        animator = GetComponentInChildren<Animator>(); if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+        }
+        animator.Play("WalkForward", 0, 0f);
+        Debug.Log("Force playing WalkForward");
+        Debug.Log("Animator being used: " + animator.gameObject.name);
         audioSource = GetComponent<AudioSource>();
 
         jumpsRemaining = maxJumps;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         HandleMovement();
         HandleJump();
     }
 
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        moveInput = context.ReadValue<Vector2>();
-        Debug.Log("OnMove fired: " + moveInput + " | phase: " + context.phase);
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        Debug.Log("OnJump fired: " + context.phase);
-
-        if (context.performed)
-            jumpPressed = true;
-    }
-
-    void HandleMovement()
+    private void HandleMovement()
     {
         Vector3 forward = cam.forward;
         Vector3 right = cam.right;
@@ -118,6 +92,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         if (moveDirection.magnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
                 targetRotation,
@@ -129,59 +104,70 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         velocity.y = rb.linearVelocity.y;
         rb.linearVelocity = velocity;
 
-        if (animator != null)
-        {
-            animator.SetFloat("Speed", moveDirection.magnitude);
-            animator.SetBool("IsGrounded", isGrounded);
-        }
+        UpdateMovementAnimation();
     }
 
-    void HandleJump()
+    private void UpdateMovementAnimation()
+    {
+        if (animator == null) return;
+
+        Vector2 normalizedInput = moveInput.normalized;
+
+        animator.SetFloat(MoveXHash, normalizedInput.x, 0.1f, Time.deltaTime);
+        animator.SetFloat(MoveYHash, normalizedInput.y, 0.1f, Time.deltaTime);
+        animator.SetBool(IsGroundedHash, isGrounded);
+    }
+
+    private void HandleJump()
     {
         if (jumpPressed && jumpsRemaining > 0)
         {
-            Debug.Log("Jump logic entered");
-
             jumpsRemaining--;
             isGrounded = false;
 
             if (animator != null)
             {
-                animator.ResetTrigger("Jump");
-                animator.SetTrigger("Jump");
-                animator.SetBool("IsGrounded", false);
-                animator.Play("Jump", 0, 0f);
+                animator.ResetTrigger(JumpHash);
+                animator.SetTrigger(JumpHash);
+                animator.SetBool(IsGroundedHash, false);
             }
 
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
-            if (audioSource == null)
-            {
-                Debug.Log("audioSource is NULL");
-            }
-            else
-            {
-                Debug.Log("audioSource found");
-            }
-
-            if (jumpClip == null)
-            {
-                Debug.Log("jumpClip is NULL");
-            }
-            else
-            {
-                Debug.Log("jumpClip found: " + jumpClip.name);
-            }
-
             if (audioSource != null && jumpClip != null)
             {
-                Debug.Log("Playing jump sound now");
                 audioSource.PlayOneShot(jumpClip, jumpVolume);
             }
         }
 
         jumpPressed = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Lava"))
+        {
+            transform.position = new Vector3(95.1f, 2.5f, 164.9f);
+            rb.linearVelocity = Vector3.zero;
+        }
+
+        if (other.CompareTag("Winning"))
+        {
+            WinGame();
+        }
+    }
+
+    private void WinGame()
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.isKinematic = true;
+        enabled = false;
+
+        if (winText != null)
+        {
+            winText.SetActive(true);
+        }
     }
 
     private void OnCollisionStay(Collision collision)
@@ -192,6 +178,11 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             {
                 isGrounded = true;
                 jumpsRemaining = maxJumps;
+
+                if (animator != null)
+                {
+                    animator.SetBool(IsGroundedHash, true);
+                }
             }
         }
     }
@@ -201,14 +192,60 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = false;
+
+            if (animator != null)
+            {
+                animator.SetBool(IsGroundedHash, false);
+            }
+        }
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            jumpPressed = true;
+        }
+    }
+
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if (context.performed && animator != null)
+        {
+            animator.SetTrigger(AttackHash);
+        }
+    }
+
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        // Using Crouch input as Block for now.
+        isBlocking = context.ReadValueAsButton();
+
+        if (animator != null)
+        {
+            animator.SetBool(IsBlockingHash, isBlocking);
+        }
+    }
+
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        // Using Interact input as Cast Spell for now.
+        if (context.performed && animator != null)
+        {
+            animator.SetTrigger(CastSpellHash);
         }
     }
 
     public void OnLook(InputAction.CallbackContext context) { }
-    public void OnAttack(InputAction.CallbackContext context) { }
-    public void OnInteract(InputAction.CallbackContext context) { }
-    public void OnCrouch(InputAction.CallbackContext context) { }
+
     public void OnPrevious(InputAction.CallbackContext context) { }
+
     public void OnNext(InputAction.CallbackContext context) { }
+
     public void OnSprint(InputAction.CallbackContext context) { }
 }
