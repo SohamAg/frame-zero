@@ -20,12 +20,10 @@ public class MonsterAttack : MonoBehaviour
 
     public void DealDamage()
     {
-        if (Time.time < lastAttackTime + attackCooldown)
-            return;
-
         if (playerHealth == null) return;
 
-        Debug.Log("Damage dealt: " + damage);
+        if (Time.time < lastAttackTime + attackCooldown)
+            return;
 
         playerHealth.TakeDamage(damage);
 

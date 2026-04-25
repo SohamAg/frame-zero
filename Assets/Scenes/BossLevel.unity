@@ -221,7 +221,7 @@ GameObject:
   - component: {fileID: 10400520}
   - component: {fileID: 10400519}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2843,7 +2843,7 @@ GameObject:
   - component: {fileID: 1152529131}
   - component: {fileID: 1152529130}
   m_Layer: 5
-  m_Name: HealthBar
+  m_Name: PlayerHealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5229,7 +5229,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1342959200176554030, guid: 71c2b86e4d7bc49b894c67d7b7a7b83f, type: 3}
       propertyPath: m_Name
-      value: monster_orc
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 1342959200176554030, guid: 71c2b86e4d7bc49b894c67d7b7a7b83f, type: 3}
       propertyPath: m_Layer
@@ -5778,8 +5778,8 @@ SceneRoots:
   - {fileID: 149545}
   - {fileID: 1142643641}
   - {fileID: 1082267519}
-  - {fileID: 1992228857}
+  - {fileID: 977230845}
   - {fileID: 1989437415}
   - {fileID: 311459980}
-  - {fileID: 977230845}
   - {fileID: 10400522}
+  - {fileID: 1992228857}
