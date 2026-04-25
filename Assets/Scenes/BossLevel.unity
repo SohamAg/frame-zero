@@ -1163,8 +1163,9 @@ MonoBehaviour:
   player: {fileID: 311459980}
   sightRange: 10
   attackRange: 2
-  levelCompleteCanvas: {fileID: 948466926}
+  attackCooldown: 1.5
   health: 100
+  levelCompleteCanvas: {fileID: 948466926}
 --- !u!114 &323266759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1193,7 +1194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 100
-  healthBar: {fileID: 0}
+  healthBar: {fileID: 894855284}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
