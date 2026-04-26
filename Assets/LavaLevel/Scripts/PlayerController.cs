@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
@@ -16,6 +16,10 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     public float rotationSpeed = 10f;
     public int maxJumps = 2;
 
+    [Header("Jump Feel")]
+    public float fallMultiplier = 3f;
+    public float lowJumpMultiplier = 2f;
+
     [Header("Audio")]
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 1f;
@@ -32,7 +36,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     private Vector2 moveInput;
     private bool jumpPressed;
     private bool isGrounded;
-    private bool isBlocking;
     private int jumpsRemaining;
 
     private static readonly int MoveXHash = Animator.StringToHash("MoveX");
@@ -49,29 +52,19 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         inputActions.Player.SetCallbacks(this);
     }
 
-    private void OnEnable()
-    {
-        inputActions.Player.Enable();
-    }
-
-    private void OnDisable()
-    {
-        inputActions.Player.Disable();
-    }
+    private void OnEnable() => inputActions.Player.Enable();
+    private void OnDisable() => inputActions.Player.Disable();
 
     private void Start()
     {
-
         rb = GetComponent<Rigidbody>();
         cam = Camera.main.transform;
-        animator = GetComponentInChildren<Animator>(); if (animator == null)
+        audioSource = GetComponent<AudioSource>();
+
+        if (animator == null)
         {
             animator = GetComponentInChildren<Animator>();
         }
-        animator.Play("WalkForward", 0, 0f);
-        Debug.Log("Force playing WalkForward");
-        Debug.Log("Animator being used: " + animator.gameObject.name);
-        audioSource = GetComponent<AudioSource>();
 
         jumpsRemaining = maxJumps;
     }
@@ -80,8 +73,12 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     {
         HandleMovement();
         HandleJump();
+        ApplyBetterGravity();
     }
 
+    // =========================
+    // MOVEMENT (FIXED)
+    // =========================
     private void HandleMovement()
     {
         Vector3 forward = cam.forward;
@@ -93,22 +90,26 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         forward.Normalize();
         right.Normalize();
 
-        Vector3 moveDirection = (forward * moveInput.y + right * moveInput.x).normalized;
+        Vector3 moveDirection = forward * moveInput.y + right * moveInput.x;
 
-        if (moveDirection.magnitude > 0.1f)
+        if (moveDirection.magnitude > 1f)
+            moveDirection.Normalize();
+
+        // Apply velocity
+        Vector3 velocity = moveDirection * moveSpeed;
+        velocity.y = rb.linearVelocity.y;
+        rb.linearVelocity = velocity;
+
+        // 🔥 FIX: Character faces camera, NOT movement
+        if (moveDirection.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
                 targetRotation,
                 rotationSpeed * Time.fixedDeltaTime
             );
         }
-
-        Vector3 velocity = moveDirection * moveSpeed;
-        velocity.y = rb.linearVelocity.y;
-        rb.linearVelocity = velocity;
 
         UpdateMovementAnimation();
     }
@@ -124,6 +125,9 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         animator.SetBool(IsGroundedHash, isGrounded);
     }
 
+    // =========================
+    // JUMP (FIXED)
+    // =========================
     private void HandleJump()
     {
         if (jumpPressed && jumpsRemaining > 0)
@@ -131,25 +135,104 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             jumpsRemaining--;
             isGrounded = false;
 
-            if (animator != null)
-            {
-                animator.ResetTrigger(JumpHash);
-                animator.SetTrigger(JumpHash);
-                animator.SetBool(IsGroundedHash, false);
-            }
+            animator?.SetTrigger(JumpHash);
 
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
-            if (audioSource != null && jumpClip != null)
-            {
+            if (audioSource && jumpClip)
                 audioSource.PlayOneShot(jumpClip, jumpVolume);
-            }
         }
 
         jumpPressed = false;
     }
 
+    // =========================
+    // BETTER GRAVITY (FIX FLOATY JUMP)
+    // =========================
+    private void ApplyBetterGravity()
+    {
+        if (rb.linearVelocity.y < 0)
+        {
+            rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+        }
+        else if (rb.linearVelocity.y > 0 && !jumpPressed)
+        {
+            rb.linearVelocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
+        }
+    }
+
+    // =========================
+    // GROUND CHECK (FIX TRIPLE JUMP)
+    // =========================
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            if (rb.linearVelocity.y <= 0.1f)
+            {
+                isGrounded = true;
+                jumpsRemaining = maxJumps;
+            }
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
+    }
+
+    // =========================
+    // INPUTS
+    // =========================
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            jumpPressed = true;
+    }
+
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            animator?.SetTrigger(AttackHash);
+    }
+
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        bool isBlocking = context.ReadValueAsButton();
+
+        animator?.SetBool(IsBlockingHash, isBlocking);
+
+        // equipment swap
+        swordHand.SetActive(!isBlocking);
+        swordBack.SetActive(isBlocking);
+
+        shieldHand.SetActive(isBlocking);
+        shieldBack.SetActive(!isBlocking);
+    }
+
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            animator?.SetTrigger(CastSpellHash);
+    }
+
+    public void OnLook(InputAction.CallbackContext context) { }
+    public void OnPrevious(InputAction.CallbackContext context) { }
+    public void OnNext(InputAction.CallbackContext context) { }
+    public void OnSprint(InputAction.CallbackContext context) { }
+
+    // =========================
+    // GAME LOGIC
+    // =========================
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Lava"))
@@ -160,105 +243,10 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
         if (other.CompareTag("Winning"))
         {
-            WinGame();
+            rb.linearVelocity = Vector3.zero;
+            rb.isKinematic = true;
+            enabled = false;
+            winText?.SetActive(true);
         }
     }
-
-    private void WinGame()
-    {
-        rb.linearVelocity = Vector3.zero;
-        rb.isKinematic = true;
-        enabled = false;
-
-        if (winText != null)
-        {
-            winText.SetActive(true);
-        }
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            if (!isGrounded)
-            {
-                isGrounded = true;
-                jumpsRemaining = maxJumps;
-
-                if (animator != null)
-                {
-                    animator.SetBool(IsGroundedHash, true);
-                }
-            }
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = false;
-
-            if (animator != null)
-            {
-                animator.SetBool(IsGroundedHash, false);
-            }
-        }
-    }
-
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        moveInput = context.ReadValue<Vector2>();
-    }
-
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            jumpPressed = true;
-        }
-    }
-
-    public void OnAttack(InputAction.CallbackContext context)
-    {
-        if (context.performed && animator != null)
-        {
-            animator.SetTrigger(AttackHash);
-        }
-    }
-
-    public void OnCrouch(InputAction.CallbackContext context)
-    {
-        bool isBlocking = context.ReadValueAsButton();
-
-        if (animator != null)
-        {
-            animator.SetBool(IsBlockingHash, isBlocking);
-        }
-
-        // Sword swap
-        swordHand.SetActive(!isBlocking);
-        swordBack.SetActive(isBlocking);
-
-        // Shield swap
-        shieldHand.SetActive(isBlocking);
-        shieldBack.SetActive(!isBlocking);
-    }
-
-    public void OnInteract(InputAction.CallbackContext context)
-    {
-        // Using Interact input as Cast Spell for now.
-        if (context.performed && animator != null)
-        {
-            animator.SetTrigger(CastSpellHash);
-        }
-    }
-
-    public void OnLook(InputAction.CallbackContext context) { }
-
-    public void OnPrevious(InputAction.CallbackContext context) { }
-
-    public void OnNext(InputAction.CallbackContext context) { }
-
-    public void OnSprint(InputAction.CallbackContext context) { }
 }
