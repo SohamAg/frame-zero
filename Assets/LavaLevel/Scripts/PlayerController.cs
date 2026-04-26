@@ -1,24 +1,42 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
 public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
+    [Header("Equipment")]
+    [SerializeField] private GameObject swordHand;
+    [SerializeField] private GameObject swordBack;
+    [SerializeField] private GameObject shieldHand;
+    [SerializeField] private GameObject shieldBack;
+    [SerializeField] private float sidewaysSpeedMultiplier = 0.65f;
+    [SerializeField] private float backwardSpeedMultiplier = 0.6f;
+    private Vector2 smoothedMoveInput;
+    [SerializeField] private float animationSmoothTime = 12f;
+    [SerializeField] private float acceleration = 60f;
+    [SerializeField] private float deceleration = 100f;
+    [SerializeField] private float airMoveMultiplier = 1.25f;
+
     [Header("Movement")]
     public float moveSpeed = 6f;
     public float jumpForce = 7f;
     public float rotationSpeed = 10f;
     public int maxJumps = 2;
 
-
+    [Header("Jump Feel")]
+    public float fallMultiplier = 3f;
+    public float lowJumpMultiplier = 2f;
 
     [Header("Audio")]
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 1f;
 
+    [Header("UI")]
+    public GameObject winText;
+
     private Rigidbody rb;
     private Transform cam;
-    private Animator animator;
+    [SerializeField] private Animator animator;
     private AudioSource audioSource;
     private InputSystem_Actions inputActions;
 
@@ -27,168 +45,143 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     private bool isGrounded;
     private int jumpsRemaining;
 
-    public GameObject winText;
+    private static readonly int MoveXHash = Animator.StringToHash("MoveX");
+    private static readonly int MoveYHash = Animator.StringToHash("MoveY");
+    private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
+    private static readonly int IsBlockingHash = Animator.StringToHash("IsBlocking");
+    private static readonly int JumpHash = Animator.StringToHash("Jump");
+    private static readonly int AttackHash = Animator.StringToHash("Attack");
+    private static readonly int CastSpellHash = Animator.StringToHash("CastSpell");
 
-    private void OnTriggerEnter(Collider other)
+    private void Awake()
     {
-        if (other.CompareTag("Lava"))
-        {
-            Debug.Log("Player touched lava!");
-
-            transform.position = new Vector3(95.1f, 2.5f, 164.9f);
-            rb.linearVelocity = Vector3.zero;
-        }
-
-        if (other.CompareTag("Winning"))
-        {
-            WinGame();
-        }
-    }
-
-    void WinGame()
-    {
-        rb.linearVelocity = Vector3.zero;
-        rb.isKinematic = true;
-        enabled = false;
-        Debug.Log("LMAO");
-        winText.SetActive(true);
-    }
-
-    void Awake()
-    {
-        Debug.Log("Awake ran");
         inputActions = new InputSystem_Actions();
         inputActions.Player.SetCallbacks(this);
     }
 
-    void OnEnable()
-    {
-        Debug.Log("OnEnable ran");
-        inputActions.Player.Enable();
-    }
+    private void OnEnable() => inputActions.Player.Enable();
+    private void OnDisable() => inputActions.Player.Disable();
 
-    void OnDisable()
-    {
-        inputActions.Player.Disable();
-    }
-
-    void Start()
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
         cam = Camera.main.transform;
-        animator = GetComponentInChildren<Animator>();
         audioSource = GetComponent<AudioSource>();
+
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+        }
 
         jumpsRemaining = maxJumps;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         HandleMovement();
         HandleJump();
+        ApplyBetterGravity();
     }
 
-    public void OnMove(InputAction.CallbackContext context)
+    // =========================
+    // MOVEMENT (FIXED)
+    // =========================
+    private void HandleMovement()
     {
-        moveInput = context.ReadValue<Vector2>();
-        Debug.Log("OnMove fired: " + moveInput + " | phase: " + context.phase);
-    }
+        float turnInput = moveInput.x;
+        float forwardInput = moveInput.y;
 
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        Debug.Log("OnJump fired: " + context.phase);
-
-        if (context.performed)
-            jumpPressed = true;
-    }
-
-    void HandleMovement()
-    {
-        Vector3 forward = cam.forward;
-        Vector3 right = cam.right;
-
-        forward.y = 0f;
-        right.y = 0f;
-
-        forward.Normalize();
-        right.Normalize();
-
-        Vector3 moveDirection = (forward * moveInput.y + right * moveInput.x).normalized;
-
-        if (moveDirection.magnitude > 0.1f)
+        // Rotate left/right with A/D
+        if (Mathf.Abs(turnInput) > 0.01f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.fixedDeltaTime
+            transform.Rotate(
+                Vector3.up,
+                turnInput * rotationSpeed * 10f * Time.fixedDeltaTime
             );
         }
 
-        Vector3 velocity = moveDirection * moveSpeed;
-        velocity.y = rb.linearVelocity.y;
-        rb.linearVelocity = velocity;
+        // Forward/backward movement based on where player is facing
+        float speedMultiplier = 1f;
 
-        if (animator != null)
+        if (forwardInput < 0f)
         {
-            animator.SetFloat("Speed", moveDirection.magnitude);
-            animator.SetBool("IsGrounded", isGrounded);
+            speedMultiplier = backwardSpeedMultiplier;
         }
+
+        float currentMoveSpeed = isGrounded ? moveSpeed : moveSpeed * airMoveMultiplier;
+
+        Vector3 moveDirection = transform.forward * forwardInput;
+        Vector3 targetVelocity = moveDirection * currentMoveSpeed * speedMultiplier;
+
+        rb.linearVelocity = new Vector3(
+            targetVelocity.x,
+            rb.linearVelocity.y,
+            targetVelocity.z
+        );
+
+        UpdateMovementAnimation();
     }
 
-    void HandleJump()
+    private void UpdateMovementAnimation()
+    {
+        if (animator == null) return;
+
+        smoothedMoveInput = Vector2.Lerp(
+        smoothedMoveInput,
+        moveInput.normalized,
+        animationSmoothTime * Time.deltaTime
+        );
+
+        animator.SetFloat(MoveXHash, smoothedMoveInput.x, 0.12f, Time.deltaTime);
+        animator.SetFloat(MoveYHash, smoothedMoveInput.y, 0.12f, Time.deltaTime);
+        animator.SetBool(IsGroundedHash, isGrounded);
+    }
+
+    // =========================
+    // JUMP (FIXED)
+    // =========================
+    private void HandleJump()
     {
         if (jumpPressed && jumpsRemaining > 0)
         {
-            Debug.Log("Jump logic entered");
-
             jumpsRemaining--;
             isGrounded = false;
 
-            if (animator != null)
-            {
-                animator.ResetTrigger("Jump");
-                animator.SetTrigger("Jump");
-                animator.SetBool("IsGrounded", false);
-                animator.Play("Jump", 0, 0f);
-            }
+            animator?.SetTrigger(JumpHash);
 
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
-            if (audioSource == null)
-            {
-                Debug.Log("audioSource is NULL");
-            }
-            else
-            {
-                Debug.Log("audioSource found");
-            }
-
-            if (jumpClip == null)
-            {
-                Debug.Log("jumpClip is NULL");
-            }
-            else
-            {
-                Debug.Log("jumpClip found: " + jumpClip.name);
-            }
-
-            if (audioSource != null && jumpClip != null)
-            {
-                Debug.Log("Playing jump sound now");
+            if (audioSource && jumpClip)
                 audioSource.PlayOneShot(jumpClip, jumpVolume);
-            }
         }
 
         jumpPressed = false;
     }
 
+    // =========================
+    // BETTER GRAVITY (FIX FLOATY JUMP)
+    // =========================
+    private void ApplyBetterGravity()
+    {
+        if (rb.linearVelocity.y < 0)
+        {
+            rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+        }
+        else if (rb.linearVelocity.y > 0 && !jumpPressed)
+        {
+            rb.linearVelocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
+        }
+    }
+
+    // =========================
+    // GROUND CHECK (FIX TRIPLE JUMP)
+    // =========================
     private void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            if (!isGrounded)
+            if (rb.linearVelocity.y <= 0.1f)
             {
                 isGrounded = true;
                 jumpsRemaining = maxJumps;
@@ -204,11 +197,68 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         }
     }
 
+    // =========================
+    // INPUTS
+    // =========================
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            jumpPressed = true;
+    }
+
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            animator?.SetTrigger(AttackHash);
+    }
+
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        bool isBlocking = context.ReadValueAsButton();
+
+        animator?.SetBool(IsBlockingHash, isBlocking);
+
+        // equipment swap
+        swordHand.SetActive(!isBlocking);
+        swordBack.SetActive(isBlocking);
+
+        shieldHand.SetActive(isBlocking);
+        shieldBack.SetActive(!isBlocking);
+    }
+
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            animator?.SetTrigger(CastSpellHash);
+    }
+
     public void OnLook(InputAction.CallbackContext context) { }
-    public void OnAttack(InputAction.CallbackContext context) { }
-    public void OnInteract(InputAction.CallbackContext context) { }
-    public void OnCrouch(InputAction.CallbackContext context) { }
     public void OnPrevious(InputAction.CallbackContext context) { }
     public void OnNext(InputAction.CallbackContext context) { }
     public void OnSprint(InputAction.CallbackContext context) { }
+
+    // =========================
+    // GAME LOGIC
+    // =========================
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Lava"))
+        {
+            transform.position = new Vector3(95.1f, 2.5f, 164.9f);
+            rb.linearVelocity = Vector3.zero;
+        }
+
+        if (other.CompareTag("Winning"))
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.isKinematic = true;
+            enabled = false;
+            winText?.SetActive(true);
+        }
+    }
 }
