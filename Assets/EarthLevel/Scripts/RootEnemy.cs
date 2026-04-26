@@ -6,13 +6,13 @@ public class RootEnemy : MonoBehaviour
     public float speed;
 
     // distance threshold for ai states
-    private float slowThreshold = 20f;
+    private float slowThreshold = 25f;
     private float fastThreshold = 10f;
 
     // speeds for states
-    private float fastSpeed = 13f;
+    private float fastSpeed = 12f;
     private float slowSpeed = 10f;
-    private float patrolSpeed = 6f;
+    private float patrolSpeed = 3f;
     public enum AIState
     {
         Patrol,
