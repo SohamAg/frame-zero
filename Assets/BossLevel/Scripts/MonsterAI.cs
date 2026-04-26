@@ -1,0 +1,94 @@
+using UnityEngine;
+using UnityEngine.AI;
+
+public class MonsterAI : MonoBehaviour
+{
+    public Transform player;
+
+    public float sightRange = 10f;
+    public float attackRange = 2f;
+
+    public float attackCooldown = 1.5f;
+    private float lastAttackTime;
+
+    private NavMeshAgent agent;
+    private Animator animator;
+
+    public int health = 100;
+    public GameObject levelCompleteCanvas;
+
+    void Start()
+    {
+        agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+    }
+
+    void Update()
+    {
+        if (player == null) return;
+
+        float distance = Vector3.Distance(transform.position, player.position);
+
+        // 🔹 FAR → IDLE
+        if (distance > sightRange)
+        {
+            agent.SetDestination(transform.position);
+            animator.SetFloat("Speed", 0);
+        }
+        // 🔹 MID → CHASE (walk/run)
+        else if (distance > attackRange)
+        {
+            agent.SetDestination(player.position);
+            animator.SetFloat("Speed", agent.velocity.magnitude);
+        }
+        // 🔹 CLOSE → ATTACK
+        else
+        {
+            agent.SetDestination(transform.position);
+            animator.SetFloat("Speed", 0);
+
+            if (Time.time >= lastAttackTime + attackCooldown)
+            {
+                // random attack (if you have multiple)
+                int attackType = Random.Range(1, 4);
+
+                if (attackType == 1)
+                    animator.SetTrigger("Attack1");
+                else if (attackType == 2)
+                    animator.SetTrigger("Attack2");
+                else
+                    animator.SetTrigger("Attack3");
+
+                lastAttackTime = Time.time;
+            }
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+
+        if (health > 0)
+        {
+            animator.SetTrigger("Hit");
+        }
+        else
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        animator.SetTrigger("Die");
+
+        agent.enabled = false;
+
+        if (levelCompleteCanvas != null)
+            levelCompleteCanvas.SetActive(true);
+
+        gameObject.SetActive(false);
+    }
+}

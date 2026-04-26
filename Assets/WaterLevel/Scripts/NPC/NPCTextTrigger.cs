@@ -54,7 +54,7 @@ public class NPCTextTrigger : MonoBehaviour
     // teach
     public void LearnPowers()
     {
-        questionText.text = "Wizard: To obtain my powers, you must brew a potion using three rare items.";
+        questionText.text = "Wizard: To obtain my powers, you must brew a potion using three items. Bring me a fish, a crystal shard, and an ice berry";
     }
 
     // give

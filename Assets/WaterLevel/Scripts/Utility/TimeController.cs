@@ -1,156 +1,115 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
 public class TimeController : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject gameOverCanvas;
-
+    [SerializeField] private GameObject gameOverCanvas;
     private bool gameEnded = false;
 
-    [SerializeField]
-    private float timeMultiplier;
+    [Header("Time Settings")]
+    [SerializeField] private float timeMultiplier = 60f; // speed of time
+    [SerializeField] private float startHour = 8f;
+    private float currentTime; // 0–24 hours
 
-    [SerializeField]
-    private float startHour;
+    [SerializeField] private TextMeshProUGUI timeText;
 
-    [SerializeField]
-    private TextMeshProUGUI timeText;
+    [Header("Light Settings")]
+    [SerializeField] private Light sunLight;
+    [SerializeField] private float sunriseHour = 6f;
+    [SerializeField] private float sunsetHour = 18f;
+    [SerializeField] private float maxSunLightIntensity = 1f;
 
-    [SerializeField]
-    private Light sunLight;
+    [SerializeField] private Light moonLight;
+    [SerializeField] private float maxMoonLightIntensity = 0.5f;
 
-    [SerializeField]
-    private float sunriseHour;
+    [SerializeField] private Color dayAmbientLight;
+    [SerializeField] private Color nightAmbientLight;
+    [SerializeField] private AnimationCurve lightChangeCurve;
 
-    [SerializeField]
-    private float sunsetHour;
-
-    [SerializeField]
-    private Color dayAmbientLight;
-
-    [SerializeField]
-    private Color nightAmbientLight;
-
-    [SerializeField]
-    private AnimationCurve lightChangeCurve;
-
-    [SerializeField]
-    private float maxSunLightIntensity;
-
-    [SerializeField]
-    private Light moonLight;
-
-    [SerializeField]
-    private float maxMoonLightIntensity;
-
-    private DateTime currentTime;
-
-    private TimeSpan sunriseTime;
-
-    private TimeSpan sunsetTime;
-
-    // Start is called before the first frame update
     void Start()
     {
-        currentTime = DateTime.Now.Date + TimeSpan.FromHours(startHour);
-
-        sunriseTime = TimeSpan.FromHours(sunriseHour);
-        sunsetTime = TimeSpan.FromHours(sunsetHour);
+        currentTime = startHour;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (gameEnded) return;
 
-        UpdateTimeOfDay();
+        UpdateTime();
         RotateSun();
-        UpdateLightSettings();
+        UpdateLighting();
         CheckForGameOver();
     }
 
-    private void UpdateTimeOfDay()
+    private void UpdateTime()
     {
-        currentTime = currentTime.AddSeconds(Time.deltaTime * timeMultiplier);
+        currentTime += Time.deltaTime * timeMultiplier / 3600f;
+
+        if (currentTime >= 24f)
+            currentTime -= 24f;
 
         if (timeText != null)
         {
-            timeText.text = currentTime.ToString("HH:mm");
+            int hours = Mathf.FloorToInt(currentTime);
+            int minutes = Mathf.FloorToInt((currentTime - hours) * 60f);
+            timeText.text = $"{hours:00}:{minutes:00}";
         }
     }
 
     private void RotateSun()
     {
-        float sunLightRotation;
+        float normalizedTime;
 
-        if (currentTime.TimeOfDay > sunriseTime && currentTime.TimeOfDay < sunsetTime)
+        if (currentTime >= sunriseHour && currentTime < sunsetHour)
         {
-            TimeSpan sunriseToSunsetDuration = CalculateTimeDifference(sunriseTime, sunsetTime);
-            TimeSpan timeSinceSunrise = CalculateTimeDifference(sunriseTime, currentTime.TimeOfDay);
-
-            double percentage = timeSinceSunrise.TotalMinutes / sunriseToSunsetDuration.TotalMinutes;
-
-            sunLightRotation = Mathf.Lerp(0, 180, (float)percentage);
+            normalizedTime = (currentTime - sunriseHour) / (sunsetHour - sunriseHour);
+            sunLight.transform.rotation = Quaternion.Euler(Mathf.Lerp(0, 180, normalizedTime), 0, 0);
         }
         else
         {
-            TimeSpan sunsetToSunriseDuration = CalculateTimeDifference(sunsetTime, sunriseTime);
-            TimeSpan timeSinceSunset = CalculateTimeDifference(sunsetTime, currentTime.TimeOfDay);
+            float nightLength = (24f - sunsetHour) + sunriseHour;
 
-            double percentage = timeSinceSunset.TotalMinutes / sunsetToSunriseDuration.TotalMinutes;
+            float timeSinceSunset = (currentTime >= sunsetHour)
+                ? currentTime - sunsetHour
+                : currentTime + (24f - sunsetHour);
 
-            sunLightRotation = Mathf.Lerp(180, 360, (float)percentage);
+            normalizedTime = timeSinceSunset / nightLength;
+            sunLight.transform.rotation = Quaternion.Euler(Mathf.Lerp(180, 360, normalizedTime), 0, 0);
         }
-
-        sunLight.transform.rotation = Quaternion.AngleAxis(sunLightRotation, Vector3.right);
     }
 
-    private void UpdateLightSettings()
+    private void UpdateLighting()
     {
-        float dotProduct = Vector3.Dot(sunLight.transform.forward, Vector3.down);
-        sunLight.intensity = Mathf.Lerp(0, maxSunLightIntensity, lightChangeCurve.Evaluate(dotProduct));
-        moonLight.intensity = Mathf.Lerp(maxMoonLightIntensity, 0, lightChangeCurve.Evaluate(dotProduct));
-        RenderSettings.ambientLight = Color.Lerp(nightAmbientLight, dayAmbientLight, lightChangeCurve.Evaluate(dotProduct));
+        float dot = Vector3.Dot(sunLight.transform.forward, Vector3.down);
+        float curveValue = lightChangeCurve.Evaluate(dot);
+
+        sunLight.intensity = Mathf.Lerp(0, maxSunLightIntensity, curveValue);
+        moonLight.intensity = Mathf.Lerp(maxMoonLightIntensity, 0, curveValue);
+
+        RenderSettings.ambientLight = Color.Lerp(nightAmbientLight, dayAmbientLight, curveValue);
     }
 
-    private TimeSpan CalculateTimeDifference(TimeSpan fromTime, TimeSpan toTime)
+    private void CheckForGameOver()
     {
-        TimeSpan difference = toTime - fromTime;
+        float gameOverTime = sunsetHour + 1f;
 
-        if (difference.TotalSeconds < 0)
+        if (gameOverTime >= 24f)
+            gameOverTime -= 24f;
+
+        if (currentTime >= gameOverTime && !gameEnded)
         {
-            difference += TimeSpan.FromHours(24);
+            EndGame();
         }
-
-        return difference;
     }
 
     private void EndGame()
     {
         gameEnded = true;
-        Time.timeScale = 0f; // Freeze game
+        Time.timeScale = 0f;
 
         if (gameOverCanvas != null)
             gameOverCanvas.SetActive(true);
 
         Debug.Log("Game Over: It is night!");
-    }
-    private void CheckForGameOver()
-    {
-        // Add 1 hour to sunset
-        TimeSpan gameOverTime = sunsetTime + TimeSpan.FromHours(1);
-
-        // Wrap around if it exceeds 24h
-        if (gameOverTime.TotalHours >= 24)
-            gameOverTime -= TimeSpan.FromHours(24);
-
-        if (currentTime.TimeOfDay >= gameOverTime && !gameEnded)
-        {
-            EndGame();
-        }
     }
 }
