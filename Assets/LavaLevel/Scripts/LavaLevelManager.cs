@@ -53,7 +53,12 @@ public class LavaLevelManager : MonoBehaviour
         }
 
         if (crystal != null)
+        {
+            GameProgress.fireCompleted = true;
+            GameProgress.fireCrystal = true;
+            GameProgress.swordUnlocked = true;
             crystal.CollectCrystal();
+        }
     }
 
     private IEnumerator HideText()
