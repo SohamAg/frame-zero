@@ -1403,9 +1403,9 @@ MonoBehaviour:
   backwardSpeedMultiplier: 0.6
   airMoveMultiplier: 1.25
   animationSmoothTime: 12
-  moveSpeed: 14
+  moveSpeed: 20
   jumpForce: 7
-  rotationSpeed: 10
+  rotationSpeed: 15
   maxJumps: 2
   fallMultiplier: 3
   lowJumpMultiplier: 2
@@ -1871,6 +1871,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WOOD COLLECTIBLE 7
       objectReference: {fileID: 0}
+    - target: {fileID: 3404281587047250015, guid: 3c237aa17348a1740995035cb188a662, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7423943102830779269, guid: 3c237aa17348a1740995035cb188a662, type: 3}
       propertyPath: m_LocalPosition.x
       value: -45.46
@@ -2211,6 +2215,10 @@ PrefabInstance:
     - target: {fileID: 3404281587047250015, guid: 3c237aa17348a1740995035cb188a662, type: 3}
       propertyPath: m_Name
       value: WOOD COLLECTIBLE 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3404281587047250015, guid: 3c237aa17348a1740995035cb188a662, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7423943102830779269, guid: 3c237aa17348a1740995035cb188a662, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6487,11 +6495,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 9.68, y: 21.5, z: -7.24}
-  m_LocalScale: {x: 5, y: 1, z: 5}
+  m_LocalScale: {x: 7, y: 1, z: 7}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1379294884}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1753774316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &757650162
 BoxCollider:
@@ -6921,6 +6929,10 @@ PrefabInstance:
     - target: {fileID: 3404281587047250015, guid: 3c237aa17348a1740995035cb188a662, type: 3}
       propertyPath: m_Name
       value: WOOD COLLECTIBLE 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3404281587047250015, guid: 3c237aa17348a1740995035cb188a662, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7423943102830779269, guid: 3c237aa17348a1740995035cb188a662, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8105,8 +8117,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 757650161}
     m_Modifications:
     - target: {fileID: 357601253183376812, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 357601253183376812, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 5
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 357601253183376812, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 357601253183376812, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8114,7 +8134,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 357601253183376812, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 357601253183376812, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8154,7 +8174,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1134243952032651030, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1134243952032651030, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
       propertyPath: m_TagString
@@ -8168,6 +8188,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 62fbda8410a2c52499969fa59d671a79, type: 2}
+    - target: {fileID: 2928777624215249183, guid: bd71feef6b1456c44bf79c466450cbd4, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -13525,6 +13549,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WOOD COLLECTIBLE 2
       objectReference: {fileID: 0}
+    - target: {fileID: 3404281587047250015, guid: 3c237aa17348a1740995035cb188a662, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7423943102830779269, guid: 3c237aa17348a1740995035cb188a662, type: 3}
       propertyPath: m_LocalPosition.x
       value: 65.16
@@ -16694,6 +16722,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WOOD COLLECTIBLE 3
       objectReference: {fileID: 0}
+    - target: {fileID: 3404281587047250015, guid: 3c237aa17348a1740995035cb188a662, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7423943102830779269, guid: 3c237aa17348a1740995035cb188a662, type: 3}
       propertyPath: m_LocalPosition.x
       value: -108.6
@@ -17469,6 +17501,7 @@ Transform:
   - {fileID: 1724332538}
   - {fileID: 1300218691}
   - {fileID: 978009849}
+  - {fileID: 757650161}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1753774317
@@ -20063,6 +20096,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WOOD COLLECTIBLE 5
       objectReference: {fileID: 0}
+    - target: {fileID: 3404281587047250015, guid: 3c237aa17348a1740995035cb188a662, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7423943102830779269, guid: 3c237aa17348a1740995035cb188a662, type: 3}
       propertyPath: m_LocalPosition.x
       value: -19.14
@@ -21465,7 +21502,6 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 757650161}
   - {fileID: 1753774316}
   - {fileID: 1162928575}
   - {fileID: 831283789}

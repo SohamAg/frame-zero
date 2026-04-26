@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement; // Added for restarting on death
+using UnityEngine.SceneManagement;
+using TMPro; // Added for restarting on death
 
 public class EarthLevelController : MonoBehaviour
 {
@@ -12,9 +13,11 @@ public class EarthLevelController : MonoBehaviour
     public GameObject shieldOnPlayer; // Drag hidden shield (child of player) here
     public GameObject earthCrystal;   // Drag Crystal prefab here
     public AudioClip craftSound;      // Drag crafting SFX here
-    
+
+    private Vector3 crystalRotate;
     private int collectedCount = 0;
     private int totalWoodInScene;
+    private bool shieldCrafted = false;
     private bool isGameOver = false;
     private bool canCraft = false; 
     private Rigidbody rb;
@@ -22,7 +25,7 @@ public class EarthLevelController : MonoBehaviour
 
     void Start()
     {
-        //speed = 15f;
+        crystalRotate = new Vector3(0, 100f, 0);
         rb = GetComponent<Rigidbody>();
         playerAudio = GetComponent<AudioSource>();
         
@@ -38,32 +41,16 @@ public class EarthLevelController : MonoBehaviour
     {
         if (isGameOver || Keyboard.current == null) return;
 
+        if (earthCrystal.activeSelf)
+        {
+            earthCrystal.transform.Rotate(crystalRotate * Time.deltaTime);
+        }
+
         // --- Interaction Logic ---
         if (canCraft && Keyboard.current.eKey.wasPressedThisFrame)
         {
             CraftShield();
         }
-
-        /*
-        // --- Movement Logic ---
-        Vector3 moveDirection = Vector3.zero;
-        if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) moveDirection += Vector3.forward;
-        if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) moveDirection += Vector3.back;
-        if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) moveDirection += Vector3.left;
-        if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) moveDirection += Vector3.right;
-
-        if (moveDirection != Vector3.zero)
-        {
-            transform.forward = moveDirection;
-            // Use velocity for better terrain/gravity handling
-            Vector3 vel = moveDirection.normalized * speed;
-            rb.linearVelocity = new Vector3(vel.x, rb.linearVelocity.y, vel.z);
-        }
-        else
-        {
-            rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
-        }
-        */
     }
 
     void OnTriggerEnter(Collider other)
@@ -97,6 +84,8 @@ public class EarthLevelController : MonoBehaviour
                     script.gameObject.SetActive(false);
                 }
 
+                earthCrystal.SetActive(true);
+
                 statusText.text = "Forest is Safe! Go to Altar (top of hill)";
                 statusText.color = Color.yellow;
             }
@@ -116,6 +105,8 @@ public class EarthLevelController : MonoBehaviour
         // The Win Condition
         if (other.CompareTag("Crystal"))
         {
+            if (!shieldCrafted) return;
+
             isGameOver = true;
             statusText.text = "CRYSTAL OBTAINED! LEVEL COMPLETE!";
             statusText.color = Color.green;
@@ -129,12 +120,13 @@ public class EarthLevelController : MonoBehaviour
 
     void CraftShield()
     {
-        if(shieldOnPlayer) shieldOnPlayer.SetActive(true);
-        if(earthCrystal) earthCrystal.SetActive(true);
+        if (shieldOnPlayer) shieldOnPlayer.SetActive(true);
+
         if(craftSound) playerAudio.PlayOneShot(craftSound);
         
         canCraft = false;
         statusText.text = "Shield Crafted! Collect the Crystal!";
+        shieldCrafted = true;
     }
 
     void Die()
