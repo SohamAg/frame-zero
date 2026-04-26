@@ -3,9 +3,9 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement; // Added for restarting on death
 
-public class EarthLevelPlayerController : MonoBehaviour
+public class EarthLevelController : MonoBehaviour
 {
-    public float speed; // Using a lower value with linearVelocity is usually more stable
+    //public float speed; // Using a lower value with linearVelocity is usually more stable
     public Text statusText;
     
     [Header("Alpha Objects")]
@@ -22,7 +22,7 @@ public class EarthLevelPlayerController : MonoBehaviour
 
     void Start()
     {
-        speed = 15f;
+        //speed = 15f;
         rb = GetComponent<Rigidbody>();
         playerAudio = GetComponent<AudioSource>();
         
@@ -44,6 +44,7 @@ public class EarthLevelPlayerController : MonoBehaviour
             CraftShield();
         }
 
+        /*
         // --- Movement Logic ---
         Vector3 moveDirection = Vector3.zero;
         if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) moveDirection += Vector3.forward;
@@ -62,6 +63,7 @@ public class EarthLevelPlayerController : MonoBehaviour
         {
             rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
         }
+        */
     }
 
     void OnTriggerEnter(Collider other)

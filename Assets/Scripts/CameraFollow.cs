@@ -1,21 +1,24 @@
 using UnityEngine;
+using System.Collections;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform target; // Drag your Player Capsule here
-    public Vector3 offset;
+    public Transform desiredPose;
+    public Transform target;
 
-    void Start()
+    private void Start()
     {
-        offset = new Vector3(0, 16, -24);
+        Vector3 relativePosition = new Vector3(0, 5, -7);
     }
 
     void LateUpdate()
     {
-        if (target != null)
+
+        if (desiredPose != null)
         {
-            // Keeps the camera at a fixed distance from the player
-            transform.position = target.position + offset;
+            transform.position = desiredPose.position;
+            transform.rotation = desiredPose.rotation;
+
         }
     }
 }
