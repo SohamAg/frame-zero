@@ -10,6 +10,8 @@ public class MonsterHealth : MonoBehaviour
 
     public Slider healthBar;
 
+    public GameObject crystalInScene;
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -42,7 +44,15 @@ public class MonsterHealth : MonoBehaviour
     }
 
     void Die()
+{
+    animator.SetTrigger("Death");
+
+    if (crystalInScene != null)
     {
-        animator.SetTrigger("Death");
+        crystalInScene.SetActive(true);
     }
+
+    GetComponent<Collider>().enabled = false;
+    this.enabled = false;
+}
 }
