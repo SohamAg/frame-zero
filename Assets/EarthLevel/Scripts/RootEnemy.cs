@@ -11,8 +11,8 @@ public class RootEnemy : MonoBehaviour
 
     // speeds for states
     private float fastSpeed = 13f;
-    private float slowSpeed = 9f;
-    private float patrolSpeed = 4f;
+    private float slowSpeed = 10f;
+    private float patrolSpeed = 6f;
     public enum AIState
     {
         Patrol,

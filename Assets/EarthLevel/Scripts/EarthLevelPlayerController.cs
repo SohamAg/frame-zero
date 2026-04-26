@@ -95,7 +95,7 @@ public class EarthLevelPlayerController : MonoBehaviour
                     script.gameObject.SetActive(false);
                 }
 
-                statusText.text = "Forest is Safe! Go to Altar (base of hill)";
+                statusText.text = "Forest is Safe! Go to Altar (top of hill)";
                 statusText.color = Color.yellow;
             }
         }
