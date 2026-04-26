@@ -2,6 +2,10 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
+<<<<<<< HEAD
+  serializedVersion: 2
+  tags: []
+=======
   serializedVersion: 3
   tags:
   - Wood
@@ -9,14 +13,12 @@ TagManager:
   - Ground
   - Lava
   - Winning
-  - Altar
-  - Crystal
-  - Enemy
+>>>>>>> c6d9fa11fef5b14289e00f641f396c0cc54aa91b
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Enemy
+  - 
   - Water
   - UI
   - 
@@ -49,6 +51,8 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+<<<<<<< HEAD
+=======
   m_RenderingLayers:
   - Default
   - Light Layer 1
@@ -58,3 +62,4 @@ TagManager:
   - Light Layer 5
   - Light Layer 6
   - Light Layer 7
+>>>>>>> c6d9fa11fef5b14289e00f641f396c0cc54aa91b

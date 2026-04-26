@@ -1,6 +1,13 @@
 {
   "dependencies": {
-    "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main",
+<<<<<<< HEAD
+    "com.unity.collab-proxy": "2.11.4",
+    "com.unity.feature.development": "1.0.1",
+    "com.unity.textmeshpro": "3.0.7",
+    "com.unity.timeline": "1.7.6",
+    "com.unity.ugui": "1.0.0",
+    "com.unity.visualscripting": "1.9.4",
+=======
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "2.0.9",
     "com.unity.cinemachine": "3.1.5",
@@ -15,6 +22,7 @@
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.7",
     "com.unity.modules.accessibility": "1.0.0",
+>>>>>>> c6d9fa11fef5b14289e00f641f396c0cc54aa91b
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

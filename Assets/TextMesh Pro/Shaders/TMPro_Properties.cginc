@@ -66,6 +66,14 @@ uniform float		_MaskID;
 uniform sampler2D	_MaskTex;
 uniform float4		_MaskCoord;
 uniform float4		_ClipRect;	// bottom left(x,y) : top right(z,w)
+<<<<<<< HEAD
+//uniform float		_MaskWipeControl;
+//uniform float		_MaskEdgeSoftness;
+//uniform fixed4		_MaskEdgeColor;
+//uniform bool		_MaskInverse;
+
+=======
+>>>>>>> c6d9fa11fef5b14289e00f641f396c0cc54aa91b
 uniform float		_MaskSoftnessX;
 uniform float		_MaskSoftnessY;
 
