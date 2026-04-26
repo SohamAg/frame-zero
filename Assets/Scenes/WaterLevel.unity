@@ -1594,7 +1594,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 456497257}
   m_CullTransparentMesh: 1
---- !u!1001 &459015210
 --- !u!1001 &473018043
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4183,7 +4182,7 @@ MonoBehaviour:
   animationSmoothTime: 12
   moveSpeed: 5
   jumpForce: 10
-  rotationSpeed: 8
+  rotationSpeed: 3
   maxJumps: 5
   fallMultiplier: 3
   lowJumpMultiplier: 2
