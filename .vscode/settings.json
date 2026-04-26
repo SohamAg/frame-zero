@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "frame-zero.slnx"
+    "dotnet.defaultSolution": "frame_zero.slnx"
 }
