@@ -13,12 +13,17 @@ public class Crystal : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    // Called when player clicks / hits the crystal
+    // Called when player clicks directly on the crystal
+    void OnMouseDown()
+    {
+        Hit();
+    }
+
+    // Called when player hits the crystal (can also be used by raycast)
     public void Hit()
     {
         currentHealth--;
 
-        // Optional debug
         Debug.Log(gameObject.name + " hit! Remaining: " + currentHealth);
 
         if (currentHealth <= 0)
