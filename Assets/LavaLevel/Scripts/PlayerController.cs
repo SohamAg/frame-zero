@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     [SerializeField] private float animationSmoothTime = 12f;
     [SerializeField] private float acceleration = 60f;
     [SerializeField] private float deceleration = 100f;
+    [SerializeField] private float airMoveMultiplier = 1.25f;
 
     [Header("Movement")]
     public float moveSpeed = 6f;
@@ -99,7 +100,9 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         if (moveDirection.magnitude > 1f)
             moveDirection.Normalize();
 
-        Vector3 targetVelocity = moveDirection * moveSpeed;
+        float currentMoveSpeed = isGrounded ? moveSpeed : moveSpeed * airMoveMultiplier;
+
+        Vector3 targetVelocity = moveDirection * currentMoveSpeed;
 
         rb.linearVelocity = new Vector3(
             targetVelocity.x,
