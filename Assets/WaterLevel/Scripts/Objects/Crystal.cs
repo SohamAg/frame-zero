@@ -6,7 +6,7 @@ public class Crystal : MonoBehaviour
     public int maxHealth = 3;
     private int currentHealth;
 
-    public string itemName = "Crystal Shard";
+    public string itemName = "Shards";
 
     void Start()
     {

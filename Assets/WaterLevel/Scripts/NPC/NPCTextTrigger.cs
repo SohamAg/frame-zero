@@ -54,16 +54,17 @@ public class NPCTextTrigger : MonoBehaviour
     // teach
     public void LearnPowers()
     {
-        questionText.text = "Wizard: To obtain my powers, you must brew a potion using three items. Bring me a fish, a crystal shard, and an ice berry";
+        questionText.text = "Wizard: To obtain my powers, you must brew a potion using six items. Bring me 3 fish and 3 crystal shards";
     }
 
     // give
     public void GiveItems()
     {
-        if (inventory != null && inventory.GetItemCount("Fish") >= 3)
+        if (inventory != null && inventory.GetItemCount("Fish") >= 3 && inventory.GetItemCount("Shards") >= 3)
         {
             // Remove 3 fish
             inventory.RemoveItems("Fish", 3);
+            inventory.RemoveItems("Shards", 3);
 
             // Give potion
             questionText.text = "Wizard: Ah! You have everything I need. Here is your potion!";
