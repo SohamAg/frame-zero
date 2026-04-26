@@ -14,7 +14,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     [SerializeField] private GameObject shieldHand;
     [SerializeField] private GameObject shieldBack;
 
-
     [Header("Movement Multipliers")]
     [SerializeField] private float backwardSpeedMultiplier = 0.6f;
     [SerializeField] private float airMoveMultiplier = 1.25f;
@@ -36,7 +35,16 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 1f;
 
+    [SerializeField] private AudioClip attackClip;
+    [SerializeField] private AudioClip attackClip1;
+    [SerializeField] private AudioClip blockStartClip;
+    [SerializeField] private AudioClip blockEndClip;
+    [SerializeField] private AudioClip pickupClip;
+    [SerializeField] private AudioClip castClip;
+    [SerializeField] private AudioClip castClip1;
 
+    [SerializeField, Range(0f, 1f)] private float actionVolume = 1f;
+    [SerializeField] private float pickupPitch = 0.5f;
 
     [Header("UI")]
     public GameObject winText;
@@ -62,12 +70,35 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     private static readonly int PickupHash = Animator.StringToHash("Pickup");
 
     private Coroutine equipmentRoutine;
+    private Coroutine pitchedAudioRoutine;
 
     private IEnumerator ReturnEquipmentAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         SetEquipmentNormal();
     }
+
+    private void PlayActionSound(AudioClip clip, float volume)
+    {
+        if (audioSource == null || clip == null) return;
+        audioSource.PlayOneShot(clip, volume);
+    }
+
+    private IEnumerator PlayPitchedClip(AudioClip clip, float pitch, float volume)
+    {
+        if (audioSource == null || clip == null) yield break;
+
+        float originalPitch = audioSource.pitch;
+        float safePitch = Mathf.Max(0.01f, pitch);
+
+        audioSource.pitch = safePitch;
+        audioSource.PlayOneShot(clip, volume);
+
+        yield return new WaitForSeconds(clip.length / safePitch);
+
+        audioSource.pitch = originalPitch;
+    }
+
     private void Awake()
     {
         inputActions = new InputSystem_Actions();
@@ -80,7 +111,12 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        cam = Camera.main.transform;
+
+        if (Camera.main != null)
+        {
+            cam = Camera.main.transform;
+        }
+
         audioSource = GetComponent<AudioSource>();
 
         if (animator == null)
@@ -107,6 +143,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             UpdateMovementAnimation();
             return;
         }
+
         float turnInput = moveInput.x;
         float forwardInput = moveInput.y;
 
@@ -161,6 +198,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             jumpPressed = false;
             return;
         }
+
         if (jumpPressed && jumpsRemaining > 0)
         {
             jumpsRemaining--;
@@ -171,10 +209,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
-            if (audioSource && jumpClip)
-            {
-                audioSource.PlayOneShot(jumpClip, jumpVolume);
-            }
+            PlayActionSound(jumpClip, jumpVolume);
         }
 
         jumpPressed = false;
@@ -220,6 +255,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     public void OnJump(InputAction.CallbackContext context)
     {
         if (levelConfig != null && !levelConfig.canJump) return;
+
         if (context.performed)
         {
             jumpPressed = true;
@@ -233,6 +269,9 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         if (context.performed)
         {
             animator?.SetTrigger(AttackHash);
+
+            PlayActionSound(attackClip, actionVolume);
+            PlayActionSound(attackClip1, actionVolume);
         }
     }
 
@@ -247,14 +286,15 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         if (isBlocking)
         {
             SetEquipmentBlock();
+            PlayActionSound(blockStartClip, actionVolume);
         }
         else
         {
             SetEquipmentNormal();
+            PlayActionSound(blockEndClip, actionVolume);
         }
     }
 
-    // Q = Pickup
     public void OnPickup(InputAction.CallbackContext context)
     {
         if (levelConfig != null && !levelConfig.canPickup) return;
@@ -262,6 +302,9 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
         SetEquipmentOnBack();
         animator?.SetTrigger(PickupHash);
+
+        if (pitchedAudioRoutine != null) StopCoroutine(pitchedAudioRoutine);
+        pitchedAudioRoutine = StartCoroutine(PlayPitchedClip(pickupClip, pickupPitch, actionVolume));
 
         if (levelConfig != null)
         {
@@ -273,9 +316,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         equipmentRoutine = StartCoroutine(ReturnEquipmentAfterDelay(2.4f));
     }
 
-    // F = Spell
-    // This works after you add CastSpell action in the Input Actions asset
-    // and regenerate the C# class.
     public void OnCast(InputAction.CallbackContext context)
     {
         if (levelConfig != null && !levelConfig.canCast) return;
@@ -283,6 +323,9 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
         SetEquipmentOnBack();
         animator?.SetTrigger(CastSpellHash);
+
+        PlayActionSound(castClip, actionVolume);
+        PlayActionSound(castClip1, actionVolume);
 
         if (equipmentRoutine != null) StopCoroutine(equipmentRoutine);
         equipmentRoutine = StartCoroutine(ReturnEquipmentAfterDelay(2.0f));
@@ -339,6 +382,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             transform.position = levelConfig != null
                 ? levelConfig.respawnPosition
                 : new Vector3(95.1f, 2.5f, 164.9f);
+
             rb.linearVelocity = Vector3.zero;
         }
 

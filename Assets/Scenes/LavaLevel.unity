@@ -2660,11 +2660,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4957605393579145644, guid: 4f46098734d87e24490aef9267915ad2, type: 3}
   m_PrefabInstance: {fileID: 1216766844}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &833784249 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4957605393579145647, guid: 4f46098734d87e24490aef9267915ad2, type: 3}
-  m_PrefabInstance: {fileID: 1216766844}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &833784250 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4957605393579145646, guid: 4f46098734d87e24490aef9267915ad2, type: 3}
@@ -2683,12 +2678,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelConfig: {fileID: 11400000, guid: 4978ba1ea3b927b43b095b6bf94b0356, type: 2}
-  swordHand: {fileID: 1187996110}
-  swordBack: {fileID: 955899147}
-  shieldHand: {fileID: 1738570401}
-  shieldBack: {fileID: 855871897}
+  swordHand: {fileID: 2125913962}
+  swordBack: {fileID: 1192411231}
+  shieldHand: {fileID: 2038739220}
+  shieldBack: {fileID: 1385944941}
   backwardSpeedMultiplier: 0.6
-  airMoveMultiplier: 1.5
+  airMoveMultiplier: 1.25
   animationSmoothTime: 12
   moveSpeed: 5
   jumpForce: 10
@@ -2696,10 +2691,19 @@ MonoBehaviour:
   maxJumps: 2
   fallMultiplier: 3
   lowJumpMultiplier: 2
-  jumpClip: {fileID: 0}
+  jumpClip: {fileID: 8300000, guid: d97e805d13d964000a1e08a79ca32e71, type: 3}
   jumpVolume: 1
+  attackClip: {fileID: 8300000, guid: 1b42ae31f5cb0cd4aaab70200af45796, type: 3}
+  attackClip1: {fileID: 0}
+  blockStartClip: {fileID: 8300000, guid: d1a4b34f9c9584a39919a6f1ddbeb03e, type: 3}
+  blockEndClip: {fileID: 8300000, guid: 77ff2fced608f43c5ac106fb90b82831, type: 3}
+  pickupClip: {fileID: 8300000, guid: b1790fe4dfa754e96a722bad2b5aaff1, type: 3}
+  castClip: {fileID: 8300000, guid: a929ea988107b4743bdfa6a61d83d358, type: 3}
+  castClip1: {fileID: 0}
+  actionVolume: 1
+  pickupPitch: 0.5
   winText: {fileID: 0}
-  animator: {fileID: 833784249}
+  animator: {fileID: 833784254}
 --- !u!136 &833784252
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2750,10 +2754,10 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 1
---- !u!1 &855871897 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 466176078827588958, guid: e9ea46be99de08f49b1d7ea40fa98847, type: 3}
-  m_PrefabInstance: {fileID: 1533499726}
+--- !u!95 &833784254 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 4957605393579145647, guid: 4f46098734d87e24490aef9267915ad2, type: 3}
+  m_PrefabInstance: {fileID: 1216766844}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &855871900 stripped
 Transform:
@@ -2970,11 +2974,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.026582463, y: 0.02900362, z: 0.029857984}
   m_Center: {x: 0.00058984663, y: -0.0011738276, z: 0.00070047524}
---- !u!1 &955899147 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 57e71afe94c8e1e4d9b5a12c31bd1f83, type: 3}
-  m_PrefabInstance: {fileID: 1592172226}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &955899148 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 57e71afe94c8e1e4d9b5a12c31bd1f83, type: 3}
@@ -3569,15 +3568,15 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1187996110 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 57e71afe94c8e1e4d9b5a12c31bd1f83, type: 3}
-  m_PrefabInstance: {fileID: 349442178}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1187996111 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 57e71afe94c8e1e4d9b5a12c31bd1f83, type: 3}
   m_PrefabInstance: {fileID: 349442178}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1192411231 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 57e71afe94c8e1e4d9b5a12c31bd1f83, type: 3}
+  m_PrefabInstance: {fileID: 1592172226}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1201616490
 PrefabInstance:
@@ -3929,6 +3928,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1341995007}
   m_CullTransparentMesh: 1
+--- !u!1 &1385944941 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 466176078827588958, guid: e9ea46be99de08f49b1d7ea40fa98847, type: 3}
+  m_PrefabInstance: {fileID: 1533499726}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1430344649
 GameObject:
   m_ObjectHideFlags: 0
@@ -4526,11 +4530,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -5495902117074765545, guid: c475b5341b97ac042acd4a0b039fa40e, type: 3}
---- !u!1 &1738570401 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 466176078827588958, guid: e9ea46be99de08f49b1d7ea40fa98847, type: 3}
-  m_PrefabInstance: {fileID: 1954980788}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1738570402 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 951350240802101220, guid: e9ea46be99de08f49b1d7ea40fa98847, type: 3}
@@ -5353,6 +5352,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2031094660}
   m_CullTransparentMesh: 1
+--- !u!1 &2038739220 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 466176078827588958, guid: e9ea46be99de08f49b1d7ea40fa98847, type: 3}
+  m_PrefabInstance: {fileID: 1954980788}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2102870623
 GameObject:
   m_ObjectHideFlags: 0
@@ -5398,6 +5402,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2125913962 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 57e71afe94c8e1e4d9b5a12c31bd1f83, type: 3}
+  m_PrefabInstance: {fileID: 349442178}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
