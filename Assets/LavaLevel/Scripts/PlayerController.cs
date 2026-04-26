@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     [SerializeField] private GameObject swordBack;
     [SerializeField] private GameObject shieldHand;
     [SerializeField] private GameObject shieldBack;
+    [SerializeField] private float sidewaysSpeedMultiplier = 0.65f;
+    [SerializeField] private float backwardSpeedMultiplier = 0.6f;
     private Vector2 smoothedMoveInput;
     [SerializeField] private float animationSmoothTime = 12f;
     [SerializeField] private float acceleration = 60f;
@@ -86,41 +88,36 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     // =========================
     private void HandleMovement()
     {
-        Vector3 forward = cam.forward;
-        Vector3 right = cam.right;
+        float turnInput = moveInput.x;
+        float forwardInput = moveInput.y;
 
-        forward.y = 0f;
-        right.y = 0f;
+        // Rotate left/right with A/D
+        if (Mathf.Abs(turnInput) > 0.01f)
+        {
+            transform.Rotate(
+                Vector3.up,
+                turnInput * rotationSpeed * 10f * Time.fixedDeltaTime
+            );
+        }
 
-        forward.Normalize();
-        right.Normalize();
+        // Forward/backward movement based on where player is facing
+        float speedMultiplier = 1f;
 
-        Vector3 moveDirection = forward * moveInput.y + right * moveInput.x;
-
-        if (moveDirection.magnitude > 1f)
-            moveDirection.Normalize();
+        if (forwardInput < 0f)
+        {
+            speedMultiplier = backwardSpeedMultiplier;
+        }
 
         float currentMoveSpeed = isGrounded ? moveSpeed : moveSpeed * airMoveMultiplier;
 
-        Vector3 targetVelocity = moveDirection * currentMoveSpeed;
+        Vector3 moveDirection = transform.forward * forwardInput;
+        Vector3 targetVelocity = moveDirection * currentMoveSpeed * speedMultiplier;
 
         rb.linearVelocity = new Vector3(
             targetVelocity.x,
             rb.linearVelocity.y,
             targetVelocity.z
         );
-
-        // Rotate only when moving
-        if (moveDirection.sqrMagnitude > 0.01f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                rotationSpeed * Time.fixedDeltaTime
-            );
-        }
 
         UpdateMovementAnimation();
     }
