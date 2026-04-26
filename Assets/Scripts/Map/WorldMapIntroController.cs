@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,6 +20,10 @@ public class WorldMapIntroController : MonoBehaviour
     public MonoBehaviour mapPlayerController;
     public MonoBehaviour worldMapManager;
 
+    [Header("Audio")]
+    public AudioSource uiAudioSource;
+    public float endDelay = 0.2f;
+
     [Header("Dialogue")]
     [TextArea(2, 5)]
     public string[] dialogueLines;
@@ -27,6 +32,7 @@ public class WorldMapIntroController : MonoBehaviour
 
     private int currentLineIndex = 0;
     private bool introActive = false;
+    private bool endingIntro = false;
 
     private void Start()
     {
@@ -48,7 +54,7 @@ public class WorldMapIntroController : MonoBehaviour
 
     private void Update()
     {
-        if (!introActive) return;
+        if (!introActive || endingIntro) return;
 
         if (Keyboard.current != null)
         {
@@ -67,6 +73,7 @@ public class WorldMapIntroController : MonoBehaviour
     public void StartIntro()
     {
         introActive = true;
+        endingIntro = false;
         currentLineIndex = 0;
 
         if (introPanel != null)
@@ -88,13 +95,13 @@ public class WorldMapIntroController : MonoBehaviour
     {
         if (dialogueLines == null || dialogueLines.Length == 0)
         {
-            EndIntro();
+            StartCoroutine(EndIntroAfterDelay());
             return;
         }
 
         if (currentLineIndex < 0 || currentLineIndex >= dialogueLines.Length)
         {
-            EndIntro();
+            StartCoroutine(EndIntroAfterDelay());
             return;
         }
 
@@ -104,13 +111,15 @@ public class WorldMapIntroController : MonoBehaviour
 
     public void ShowNextLine()
     {
-        if (!introActive) return;
+        if (!introActive || endingIntro) return;
+
+        PlayUISound();
 
         currentLineIndex++;
 
         if (currentLineIndex >= dialogueLines.Length)
         {
-            EndIntro();
+            StartCoroutine(EndIntroAfterDelay());
             return;
         }
 
@@ -119,7 +128,25 @@ public class WorldMapIntroController : MonoBehaviour
 
     public void SkipIntro()
     {
-        if (!introActive) return;
+        if (!introActive || endingIntro) return;
+
+        PlayUISound();
+        StartCoroutine(EndIntroAfterDelay());
+    }
+
+    private void PlayUISound()
+    {
+        if (uiAudioSource != null)
+        {
+            uiAudioSource.Play();
+        }
+    }
+
+    private IEnumerator EndIntroAfterDelay()
+    {
+        endingIntro = true;
+
+        yield return new WaitForSeconds(endDelay);
 
         EndIntro();
     }
@@ -133,6 +160,7 @@ public class WorldMapIntroController : MonoBehaviour
     private void EndIntroImmediate()
     {
         introActive = false;
+        endingIntro = false;
 
         if (introPanel != null)
             introPanel.SetActive(false);
