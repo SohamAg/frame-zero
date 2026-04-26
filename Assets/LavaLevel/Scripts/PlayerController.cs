@@ -261,7 +261,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         animator?.SetTrigger(CastSpellHash);
 
         if (equipmentRoutine != null) StopCoroutine(equipmentRoutine);
-        equipmentRoutine = StartCoroutine(ReturnEquipmentAfterDelay(1.8f));
+        equipmentRoutine = StartCoroutine(ReturnEquipmentAfterDelay(2.0f));
 
         // Add projectile/spell spawning logic here later.
     }
