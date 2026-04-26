@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class CrystalPickup : MonoBehaviour
+public class EarthCrystalScript : MonoBehaviour
 {
     private bool isCollected = false;
 
@@ -12,9 +12,9 @@ public class CrystalPickup : MonoBehaviour
 
         isCollected = true;
 
-        GameProgress.waterCompleted = true;
-        GameProgress.waterCrystal = true;
-        GameProgress.spellUnlocked = true;
+        GameProgress.earthCompleted = true;
+        GameProgress.earthCrystal = true;
+        GameProgress.shieldUnlocked = true;
 
         SceneManager.LoadScene("WorldMap");
     }

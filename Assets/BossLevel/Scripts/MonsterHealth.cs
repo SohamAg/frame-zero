@@ -15,6 +15,9 @@ public class MonsterHealth : MonoBehaviour
     [Header("Death Reward")]
     public GameObject crystalInScene;
 
+    [Header("Win UI")]
+    public GameObject winText;
+
     private bool isDead = false;
 
     void Start()
@@ -67,6 +70,8 @@ public class MonsterHealth : MonoBehaviour
         if (crystalInScene != null)
             crystalInScene.SetActive(true);
 
+        if (winText != null)
+            winText.SetActive(true);
 
         yield return new WaitForSeconds(GetDeathAnimationLength());
 
