@@ -13,8 +13,14 @@ public class PlayerHealth : MonoBehaviour
 
     public Slider healthBar;
 
+    public GameObject gameOverCanvas;
+
+    private bool isDead = false;
+    private Animator animator;
+
     void Start()
     {
+        animator = GetComponent<Animator>();
         currentHealth = maxHealth;
         defense = GetComponent<PlayerDefense>();
 
@@ -71,15 +77,26 @@ public class PlayerHealth : MonoBehaviour
         potionUsed = true;
 
         if (healthBar != null)
-        {
             healthBar.value = currentHealth;
-        }
 
         Debug.Log("Potion used! Health: " + currentHealth);
+
+
+        if (animator != null)
+        {
+            animator.SetTrigger("CastSpell");
+        }
     }
 
     void Die()
     {
+        if (isDead) return;
+        isDead = true;
+
         Debug.Log("Player died");
+
+        if (gameOverCanvas != null)
+            gameOverCanvas.SetActive(true);
+
     }
 }

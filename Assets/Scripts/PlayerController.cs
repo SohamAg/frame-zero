@@ -149,10 +149,9 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
         if (Mathf.Abs(turnInput) > 0.01f)
         {
-            transform.Rotate(
-                Vector3.up,
-                turnInput * rotationSpeed * 10f * Time.fixedDeltaTime
-            );
+            float rotationAmount = turnInput * rotationSpeed * 100f * Time.fixedDeltaTime;
+                Quaternion turnRotation = Quaternion.Euler(0f, rotationAmount, 0f);
+                rb.MoveRotation(rb.rotation * turnRotation);
         }
 
         float speedMultiplier = 1f;

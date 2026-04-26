@@ -14,36 +14,46 @@ public class MonsterAI : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
 
-    public int health = 100;
-    public GameObject levelCompleteCanvas;
+    private MonsterHealth health;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        health = GetComponent<MonsterHealth>();
 
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
+    public void SetPaused(bool paused)
+    {
+        if (agent != null)
+        {
+            agent.isStopped = paused;
+            agent.velocity = Vector3.zero;
+        }
+
+        animator.SetFloat("Speed", 0);
+
+        this.enabled = !paused;
+    }
+
     void Update()
     {
-        if (player == null) return;
+        if (player == null || health == null) return;
 
         float distance = Vector3.Distance(transform.position, player.position);
-
 
         if (distance > sightRange)
         {
             agent.SetDestination(transform.position);
             animator.SetFloat("Speed", 0);
         }
-
         else if (distance > attackRange)
         {
             agent.SetDestination(player.position);
             animator.SetFloat("Speed", agent.velocity.magnitude);
         }
-
         else
         {
             agent.SetDestination(transform.position);
@@ -51,7 +61,6 @@ public class MonsterAI : MonoBehaviour
 
             if (Time.time >= lastAttackTime + attackCooldown)
             {
-
                 int attackType = Random.Range(1, 4);
 
                 if (attackType == 1)
@@ -64,31 +73,5 @@ public class MonsterAI : MonoBehaviour
                 lastAttackTime = Time.time;
             }
         }
-    }
-
-    public void TakeDamage(int damage)
-    {
-        health -= damage;
-
-        if (health > 0)
-        {
-            animator.SetTrigger("Hit");
-        }
-        else
-        {
-            Die();
-        }
-    }
-
-    void Die()
-    {
-        animator.SetTrigger("Die");
-
-        agent.enabled = false;
-
-        if (levelCompleteCanvas != null)
-            levelCompleteCanvas.SetActive(true);
-
-        gameObject.SetActive(false);
     }
 }
