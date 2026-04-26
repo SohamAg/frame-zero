@@ -2434,7 +2434,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasToDisplay: {fileID: 153247106}
   questionText: {fileID: 1157319328}
-  crystalPrefab: {fileID: 8031177836464943687, guid: 8072a2ca47158471c9636a065c43e5f7, type: 3}
+  crystalPrefab: {fileID: 6543494578436734585, guid: 1c4d8a3597b31ec4191e9d885761eac3, type: 3}
   crystalSpawnPoint: {fileID: 1314866007}
 --- !u!4 &667658204
 Transform:
@@ -2625,7 +2625,7 @@ GameObject:
   m_Component:
   - component: {fileID: 692884037}
   m_Layer: 0
-  m_Name: Crystals
+  m_Name: Shards
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4937,7 +4937,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: c69efa0a1468e394a8a089f7200d1962, type: 3}
+  m_Resource: {fileID: 8300000, guid: f574713f3fa429845b29b27441da305f, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.3
   m_Pitch: 1
@@ -7043,7 +7043,6 @@ SceneRoots:
   - {fileID: 1121606417}
   - {fileID: 1947573980}
   - {fileID: 156129387}
-  - {fileID: 481122885}
   - {fileID: 550593958}
   - {fileID: 585688441}
   - {fileID: 784769463}
@@ -7056,5 +7055,6 @@ SceneRoots:
   - {fileID: 744461700}
   - {fileID: 692884037}
   - {fileID: 1786522074}
-  - {fileID: 667658204}
   - {fileID: 1635844266}
+  - {fileID: 667658204}
+  - {fileID: 481122885}
