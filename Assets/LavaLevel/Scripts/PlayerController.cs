@@ -217,6 +217,18 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             animator?.SetTrigger(AttackHash);
     }
 
+    public void OnPickup(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            jumpPressed = true;
+    }
+
+    public void onCast(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            jumpPressed = true;
+    }
+
     public void OnCrouch(InputAction.CallbackContext context)
     {
         bool isBlocking = context.ReadValueAsButton();
