@@ -18,7 +18,7 @@ MonoBehaviour:
   canCast: 0
   canAttack: 0
   canBlock: 0
-  defaultSword: 2
+  defaultSword: 0
   defaultShield: 0
   swordAfterPickup: 2
   shieldAfterPickup: 0

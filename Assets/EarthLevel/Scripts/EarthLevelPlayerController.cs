@@ -141,10 +141,12 @@ public class EarthLevelPlayerController : MonoBehaviour
         statusText.text = "GAME OVER!";
         statusText.color = Color.red;
         // Restarts scene after 2 seconds
-        Invoke("RestartLevel", 2f);
+        Invoke(nameof(RestartLevel), 2f);
     }
 
-    void RestartLevel() { SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
+    void RestartLevel() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 
     void UpdateUI()
     {
