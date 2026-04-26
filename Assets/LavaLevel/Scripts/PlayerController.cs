@@ -1,21 +1,26 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
+    [Header("Level Config")]
+    [SerializeField] private PlayerLevelConfig levelConfig;
+
     [Header("Equipment")]
     [SerializeField] private GameObject swordHand;
     [SerializeField] private GameObject swordBack;
     [SerializeField] private GameObject shieldHand;
     [SerializeField] private GameObject shieldBack;
-    [SerializeField] private float sidewaysSpeedMultiplier = 0.65f;
+
+
+    [Header("Movement Multipliers")]
     [SerializeField] private float backwardSpeedMultiplier = 0.6f;
+    [SerializeField] private float airMoveMultiplier = 1.25f;
+
     private Vector2 smoothedMoveInput;
     [SerializeField] private float animationSmoothTime = 12f;
-    [SerializeField] private float acceleration = 60f;
-    [SerializeField] private float deceleration = 100f;
-    [SerializeField] private float airMoveMultiplier = 1.25f;
 
     [Header("Movement")]
     public float moveSpeed = 6f;
@@ -30,6 +35,8 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     [Header("Audio")]
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 1f;
+
+
 
     [Header("UI")]
     public GameObject winText;
@@ -52,7 +59,15 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     private static readonly int JumpHash = Animator.StringToHash("Jump");
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int CastSpellHash = Animator.StringToHash("CastSpell");
+    private static readonly int PickupHash = Animator.StringToHash("Pickup");
 
+    private Coroutine equipmentRoutine;
+
+    private IEnumerator ReturnEquipmentAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SetEquipmentNormal();
+    }
     private void Awake()
     {
         inputActions = new InputSystem_Actions();
@@ -74,6 +89,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         }
 
         jumpsRemaining = maxJumps;
+        ApplyDefaultEquipmentFromConfig();
     }
 
     private void FixedUpdate()
@@ -83,15 +99,17 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         ApplyBetterGravity();
     }
 
-    // =========================
-    // MOVEMENT (FIXED)
-    // =========================
     private void HandleMovement()
     {
+        if (levelConfig != null && !levelConfig.canMove)
+        {
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            UpdateMovementAnimation();
+            return;
+        }
         float turnInput = moveInput.x;
         float forwardInput = moveInput.y;
 
-        // Rotate left/right with A/D
         if (Mathf.Abs(turnInput) > 0.01f)
         {
             transform.Rotate(
@@ -100,7 +118,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             );
         }
 
-        // Forward/backward movement based on where player is facing
         float speedMultiplier = 1f;
 
         if (forwardInput < 0f)
@@ -127,21 +144,23 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         if (animator == null) return;
 
         smoothedMoveInput = Vector2.Lerp(
-        smoothedMoveInput,
-        moveInput.normalized,
-        animationSmoothTime * Time.deltaTime
+            smoothedMoveInput,
+            moveInput.normalized,
+            animationSmoothTime * Time.deltaTime
         );
 
-        animator.SetFloat(MoveXHash, smoothedMoveInput.x, 0.12f, Time.deltaTime);
+        animator.SetFloat(MoveXHash, 0f, 0.12f, Time.deltaTime);
         animator.SetFloat(MoveYHash, smoothedMoveInput.y, 0.12f, Time.deltaTime);
         animator.SetBool(IsGroundedHash, isGrounded);
     }
 
-    // =========================
-    // JUMP (FIXED)
-    // =========================
     private void HandleJump()
     {
+        if (levelConfig != null && !levelConfig.canJump)
+        {
+            jumpPressed = false;
+            return;
+        }
         if (jumpPressed && jumpsRemaining > 0)
         {
             jumpsRemaining--;
@@ -153,15 +172,14 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
             if (audioSource && jumpClip)
+            {
                 audioSource.PlayOneShot(jumpClip, jumpVolume);
+            }
         }
 
         jumpPressed = false;
     }
 
-    // =========================
-    // BETTER GRAVITY (FIX FLOATY JUMP)
-    // =========================
     private void ApplyBetterGravity()
     {
         if (rb.linearVelocity.y < 0)
@@ -174,9 +192,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         }
     }
 
-    // =========================
-    // GROUND CHECK (FIX TRIPLE JUMP)
-    // =========================
     private void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
@@ -197,9 +212,6 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         }
     }
 
-    // =========================
-    // INPUTS
-    // =========================
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
@@ -207,34 +219,112 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (levelConfig != null && !levelConfig.canJump) return;
         if (context.performed)
+        {
             jumpPressed = true;
+        }
     }
 
     public void OnAttack(InputAction.CallbackContext context)
     {
+        if (levelConfig != null && !levelConfig.canAttack) return;
+
         if (context.performed)
+        {
             animator?.SetTrigger(AttackHash);
+        }
     }
 
     public void OnCrouch(InputAction.CallbackContext context)
     {
+        if (levelConfig != null && !levelConfig.canBlock) return;
+
         bool isBlocking = context.ReadValueAsButton();
 
         animator?.SetBool(IsBlockingHash, isBlocking);
 
-        // equipment swap
-        swordHand.SetActive(!isBlocking);
-        swordBack.SetActive(isBlocking);
+        if (isBlocking)
+        {
+            SetEquipmentBlock();
+        }
+        else
+        {
+            SetEquipmentNormal();
+        }
+    }
 
-        shieldHand.SetActive(isBlocking);
-        shieldBack.SetActive(!isBlocking);
+    // Q = Pickup
+    public void OnPickup(InputAction.CallbackContext context)
+    {
+        if (levelConfig != null && !levelConfig.canPickup) return;
+        if (!context.performed) return;
+
+        SetEquipmentOnBack();
+        animator?.SetTrigger(PickupHash);
+
+        if (levelConfig != null)
+        {
+            levelConfig.defaultSword = levelConfig.swordAfterPickup;
+            levelConfig.defaultShield = levelConfig.shieldAfterPickup;
+        }
+
+        if (equipmentRoutine != null) StopCoroutine(equipmentRoutine);
+        equipmentRoutine = StartCoroutine(ReturnEquipmentAfterDelay(2.4f));
+    }
+
+    // F = Spell
+    // This works after you add CastSpell action in the Input Actions asset
+    // and regenerate the C# class.
+    public void OnCast(InputAction.CallbackContext context)
+    {
+        if (levelConfig != null && !levelConfig.canCast) return;
+        if (!context.performed) return;
+
+        SetEquipmentOnBack();
+        animator?.SetTrigger(CastSpellHash);
+
+        if (equipmentRoutine != null) StopCoroutine(equipmentRoutine);
+        equipmentRoutine = StartCoroutine(ReturnEquipmentAfterDelay(2.0f));
     }
 
     public void OnInteract(InputAction.CallbackContext context)
     {
-        if (context.performed)
-            animator?.SetTrigger(CastSpellHash);
+    }
+
+    private void ApplyDefaultEquipmentFromConfig()
+    {
+        if (levelConfig == null)
+        {
+            SetEquipment(EquipmentPlacement.Hand, EquipmentPlacement.Back);
+            return;
+        }
+
+        SetEquipment(levelConfig.defaultSword, levelConfig.defaultShield);
+    }
+
+    private void SetEquipment(EquipmentPlacement swordPlacement, EquipmentPlacement shieldPlacement)
+    {
+        if (swordHand != null) swordHand.SetActive(swordPlacement == EquipmentPlacement.Hand);
+        if (swordBack != null) swordBack.SetActive(swordPlacement == EquipmentPlacement.Back);
+
+        if (shieldHand != null) shieldHand.SetActive(shieldPlacement == EquipmentPlacement.Hand);
+        if (shieldBack != null) shieldBack.SetActive(shieldPlacement == EquipmentPlacement.Back);
+    }
+
+    public void SetEquipmentNormal()
+    {
+        ApplyDefaultEquipmentFromConfig();
+    }
+
+    public void SetEquipmentBlock()
+    {
+        SetEquipment(EquipmentPlacement.Back, EquipmentPlacement.Hand);
+    }
+
+    public void SetEquipmentOnBack()
+    {
+        SetEquipment(EquipmentPlacement.Back, EquipmentPlacement.Back);
     }
 
     public void OnLook(InputAction.CallbackContext context) { }
@@ -242,14 +332,13 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     public void OnNext(InputAction.CallbackContext context) { }
     public void OnSprint(InputAction.CallbackContext context) { }
 
-    // =========================
-    // GAME LOGIC
-    // =========================
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Lava"))
         {
-            transform.position = new Vector3(95.1f, 2.5f, 164.9f);
+            transform.position = levelConfig != null
+                ? levelConfig.respawnPosition
+                : new Vector3(95.1f, 2.5f, 164.9f);
             rb.linearVelocity = Vector3.zero;
         }
 

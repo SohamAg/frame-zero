@@ -6,18 +6,20 @@ public class Crystal : MonoBehaviour
     public int maxHealth = 3;
     private int currentHealth;
 
-    public string itemName = "Crystal Shard";
+    public string itemName = "Crystal";
 
     void Start()
     {
         currentHealth = maxHealth;
     }
 
+    // Called when player clicks directly on the crystal
     void OnMouseDown()
     {
         Hit();
     }
 
+    // Called when player hits the crystal (can also be used by raycast)
     public void Hit()
     {
         currentHealth--;

@@ -2682,16 +2682,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05aecbf3b522eda4e8bde9ec2e182de5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelConfig: {fileID: 11400000, guid: 4978ba1ea3b927b43b095b6bf94b0356, type: 2}
   swordHand: {fileID: 1187996110}
   swordBack: {fileID: 955899147}
   shieldHand: {fileID: 1738570401}
   shieldBack: {fileID: 855871897}
-  sidewaysSpeedMultiplier: 0.65
   backwardSpeedMultiplier: 0.6
-  animationSmoothTime: 12
-  acceleration: 60
-  deceleration: 100
   airMoveMultiplier: 1.5
+  animationSmoothTime: 12
   moveSpeed: 5
   jumpForce: 10
   rotationSpeed: 8
