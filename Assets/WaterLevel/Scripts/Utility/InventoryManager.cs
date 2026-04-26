@@ -5,8 +5,14 @@ using TMPro;
 public class InventoryManager : MonoBehaviour
 {
     public TMP_Text inventoryText;
+    public static InventoryManager Instance;
 
-    private List<string> items = new List<string>();
+    private Dictionary<string, int> items = new Dictionary<string, int>();
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -15,26 +21,34 @@ public class InventoryManager : MonoBehaviour
 
     public void AddItem(string itemName)
     {
-        items.Add(itemName);
+        if (items.ContainsKey(itemName))
+        {
+            items[itemName]++;
+        }
+        else
+        {
+            items[itemName] = 1;
+        }
+
         UpdateUI();
     }
 
     public int GetItemCount(string itemName)
     {
-        int count = 0;
-        foreach (var item in items)
-        {
-            if (item == itemName) count++;
-        }
-        return count;
+        return items.ContainsKey(itemName) ? items[itemName] : 0;
     }
 
     public void RemoveItems(string itemName, int quantity)
     {
-        for (int i = 0; i < quantity; i++)
+        if (!items.ContainsKey(itemName)) return;
+
+        items[itemName] -= quantity;
+
+        if (items[itemName] <= 0)
         {
             items.Remove(itemName);
         }
+
         UpdateUI();
     }
 
@@ -49,9 +63,10 @@ public class InventoryManager : MonoBehaviour
         }
 
         inventoryText.text = "Inventory:\n";
-        foreach (string item in items)
+
+        foreach (var pair in items)
         {
-            inventoryText.text += "- " + item + "\n";
+            inventoryText.text += "- " + pair.Key + " x" + pair.Value + "\n";
         }
     }
 }

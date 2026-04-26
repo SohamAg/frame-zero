@@ -6,14 +6,21 @@ public class PlayerAttack : MonoBehaviour
     public float attackRange = 2.5f;
     public float attackCooldown = 0.5f;
 
-    public Transform attackPoint; // where ray starts (usually camera or player chest)
+    public Transform attackPoint;
     public LayerMask enemyLayer;
 
     private float lastAttackTime;
 
+    private PlayerDefense defense;
+
+    void Start()
+    {
+        defense = GetComponent<PlayerDefense>(); // get shield script
+    }
+
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // Left click attack
+        if (Input.GetMouseButtonDown(0))
         {
             TryAttack();
         }
@@ -21,12 +28,15 @@ public class PlayerAttack : MonoBehaviour
 
     void TryAttack()
     {
+
+        if (defense != null && defense.isDefending)
+            return;
+
         if (Time.time < lastAttackTime + attackCooldown)
             return;
 
         lastAttackTime = Time.time;
 
-        // Raycast forward
         RaycastHit hit;
         if (Physics.Raycast(attackPoint.position, attackPoint.forward, out hit, attackRange, enemyLayer))
         {
