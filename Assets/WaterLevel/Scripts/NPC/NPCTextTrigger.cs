@@ -8,8 +8,8 @@ public class NPCTextTrigger : MonoBehaviour
 
     private InventoryManager inventory;
 
-    // Crystal spawning
-    public GameObject crystalPrefab;
+
+    public GameObject crystalInScene;
     public Transform crystalSpawnPoint;
 
     // Win Canvas
@@ -54,37 +54,31 @@ public class NPCTextTrigger : MonoBehaviour
     // teach
     public void LearnPowers()
     {
-        questionText.text = "Wizard: To obtain my powers, you must brew a potion using three items. Bring me a fish, a crystal shard, and an ice berry";
+        questionText.text = "Wizard: To obtain my powers, you must brew a potion using six items. Bring me 3 fish and 3 crystal shards";
     }
 
     // give
     public void GiveItems()
     {
-        if (inventory != null && inventory.GetItemCount("Fish") >= 3)
+        if (inventory != null && inventory.GetItemCount("Fish") >= 3 && inventory.GetItemCount("Shards") >= 3)
         {
             // Remove 3 fish
             inventory.RemoveItems("Fish", 3);
+            inventory.RemoveItems("Shards", 3);
 
             // Give potion
             questionText.text = "Wizard: Ah! You have everything I need. Here is your potion!";
 
             inventory.AddItem("Potion");
 
-            // Spawn crystal at spawn point
-            if (crystalPrefab != null && crystalSpawnPoint != null)
+            if (crystalInScene != null)
             {
-                GameObject crystal = Instantiate(crystalPrefab, crystalSpawnPoint.position, Quaternion.identity);
-
-                CrystalPickup cp = crystal.GetComponent<CrystalPickup>();
-                if (cp != null)
-                {
-                    cp.winCanvas = winCanvas;
-                }
+                crystalInScene.SetActive(true);
             }
         }
         else
         {
-            questionText.text = "Wizard: You don’t have enough fish yet!";
+            questionText.text = "Wizard: You don’t have enough items yet!";
         }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -10,10 +11,24 @@ public class PlayerHealth : MonoBehaviour
 
     private PlayerDefense defense;
 
+    public Slider healthBar;
+
+    public GameObject gameOverCanvas;
+
+    private bool isDead = false;
+    private Animator animator;
+
     void Start()
     {
+        animator = GetComponent<Animator>();
         currentHealth = maxHealth;
         defense = GetComponent<PlayerDefense>();
+
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+        }
     }
 
     void Update()
@@ -36,6 +51,12 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= damage;
         Debug.Log("Health: " + currentHealth);
 
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth;
+        }
+
+
         if (currentHealth <= 0)
         {
             Die();
@@ -55,11 +76,27 @@ public class PlayerHealth : MonoBehaviour
 
         potionUsed = true;
 
+        if (healthBar != null)
+            healthBar.value = currentHealth;
+
         Debug.Log("Potion used! Health: " + currentHealth);
+
+
+        if (animator != null)
+        {
+            animator.SetTrigger("CastSpell");
+        }
     }
 
     void Die()
     {
+        if (isDead) return;
+        isDead = true;
+
         Debug.Log("Player died");
+
+        if (gameOverCanvas != null)
+            gameOverCanvas.SetActive(true);
+
     }
 }

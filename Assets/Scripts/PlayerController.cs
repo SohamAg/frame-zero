@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     [Header("Movement")]
     public float moveSpeed = 6f;
     public float jumpForce = 7f;
-    public float rotationSpeed = 10f;
+    public float rotationSpeed = 6f;
     public int maxJumps = 2;
 
     [Header("Jump Feel")]
@@ -149,10 +149,9 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
         if (Mathf.Abs(turnInput) > 0.01f)
         {
-            transform.Rotate(
-                Vector3.up,
-                turnInput * rotationSpeed * 10f * Time.fixedDeltaTime
-            );
+            float rotationAmount = turnInput * rotationSpeed * 100f * Time.fixedDeltaTime;
+                Quaternion turnRotation = Quaternion.Euler(0f, rotationAmount, 0f);
+                rb.MoveRotation(rb.rotation * turnRotation);
         }
 
         float speedMultiplier = 1f;

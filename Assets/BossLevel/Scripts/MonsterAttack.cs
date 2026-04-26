@@ -3,7 +3,7 @@ using UnityEngine;
 public class MonsterAttack : MonoBehaviour
 {
     public int damage = 5;
-    public float attackCooldown = 1.2f;
+    public float attackCooldown = 1.5f;
 
     private PlayerHealth playerHealth;
     private float lastAttackTime;

@@ -23,11 +23,11 @@ public class KeyboardCinemachineOrbit : MonoBehaviour
         float yawInput = 0f;
         float pitchInput = 0f;
 
-        // Rotate camera left/right
+
         if (Input.GetKey(KeyCode.Q)) yawInput -= 1f;
         if (Input.GetKey(KeyCode.E)) yawInput += 1f;
 
-        // Optional: tilt camera up/down
+
         if (Input.GetKey(KeyCode.R)) pitchInput += 1f;
         if (Input.GetKey(KeyCode.F)) pitchInput -= 1f;
 
