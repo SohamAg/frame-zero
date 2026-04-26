@@ -4,6 +4,12 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
+    [Header("Equipment")]
+    [SerializeField] private GameObject swordHand;
+    [SerializeField] private GameObject swordBack;
+    [SerializeField] private GameObject shieldHand;
+    [SerializeField] private GameObject shieldBack;
+
     [Header("Movement")]
     public float moveSpeed = 6f;
     public float jumpForce = 7f;
@@ -223,13 +229,20 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     public void OnCrouch(InputAction.CallbackContext context)
     {
-        // Using Crouch input as Block for now.
-        isBlocking = context.ReadValueAsButton();
+        bool isBlocking = context.ReadValueAsButton();
 
         if (animator != null)
         {
             animator.SetBool(IsBlockingHash, isBlocking);
         }
+
+        // Sword swap
+        swordHand.SetActive(!isBlocking);
+        swordBack.SetActive(isBlocking);
+
+        // Shield swap
+        shieldHand.SetActive(isBlocking);
+        shieldBack.SetActive(!isBlocking);
     }
 
     public void OnInteract(InputAction.CallbackContext context)
