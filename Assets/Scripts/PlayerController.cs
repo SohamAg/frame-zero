@@ -346,7 +346,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         SetEquipment(levelConfig.defaultSword, levelConfig.defaultShield);
     }
 
-    private void SetEquipment(EquipmentPlacement swordPlacement, EquipmentPlacement shieldPlacement)
+    public void SetEquipment(EquipmentPlacement swordPlacement, EquipmentPlacement shieldPlacement)
     {
         if (swordHand != null) swordHand.SetActive(swordPlacement == EquipmentPlacement.Hand);
         if (swordBack != null) swordBack.SetActive(swordPlacement == EquipmentPlacement.Back);

@@ -20,8 +20,9 @@ public class SwordPickup : MonoBehaviour
 
         if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame)
         {
-            if (levelManager != null)
-                levelManager.PickupSword();
+            Debug.Log("Pickup key pressed");
+
+            levelManager?.PickupSword();
 
             if (pickupPrompt != null)
                 pickupPrompt.SetActive(false);

@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 public class LavaLevelManager : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class LavaLevelManager : MonoBehaviour
     [SerializeField] private GameObject findSwordText;
 
     private bool hasSword = false;
+    private Coroutine hideRoutine;
 
     private void Start()
     {
@@ -22,7 +24,7 @@ public class LavaLevelManager : MonoBehaviour
         Debug.Log("Sword picked up");
 
         if (player != null)
-            player.SetEquipmentOnBack();
+            player.SetEquipment(EquipmentPlacement.Back, EquipmentPlacement.None);
 
         if (findSwordText != null)
             findSwordText.SetActive(false);
@@ -31,24 +33,34 @@ public class LavaLevelManager : MonoBehaviour
             crystal.ActivateCrystal();
     }
 
-    public void TryFinishLevel()
+    public void OnCrystalTouched()
     {
         if (!hasSword)
         {
-            Debug.Log("Need sword first");
+            Debug.Log("Find the sword first");
 
             if (findSwordText != null)
+            {
                 findSwordText.SetActive(true);
+
+                if (hideRoutine != null)
+                    StopCoroutine(hideRoutine);
+
+                hideRoutine = StartCoroutine(HideText());
+            }
 
             return;
         }
 
         if (crystal != null)
-            crystal.ActivateCrystal();
+            crystal.CollectCrystal();
     }
 
-    public bool HasSword()
+    private IEnumerator HideText()
     {
-        return hasSword;
+        yield return new WaitForSeconds(2f);
+
+        if (findSwordText != null)
+            findSwordText.SetActive(false);
     }
 }

@@ -8,7 +8,6 @@ public class LavaEndTrigger : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        if (levelManager != null)
-            levelManager.TryFinishLevel();
+        levelManager?.OnCrystalTouched();
     }
 }

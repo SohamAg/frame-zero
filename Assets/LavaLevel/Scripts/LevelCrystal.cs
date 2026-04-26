@@ -4,8 +4,11 @@ using UnityEngine.SceneManagement;
 
 public class LevelCrystal : MonoBehaviour
 {
-    [Header("Materials")]
+    [Header("References")]
+    [SerializeField] private LavaLevelManager levelManager;
     [SerializeField] private Renderer crystalRenderer;
+
+    [Header("Materials")]
     [SerializeField] private Material dullMaterial;
     [SerializeField] private Material glowMaterial;
 
@@ -31,7 +34,6 @@ public class LevelCrystal : MonoBehaviour
         if (crystalRenderer == null)
             crystalRenderer = GetComponentInChildren<Renderer>();
 
-        // Start dull
         if (crystalRenderer != null && dullMaterial != null)
             crystalRenderer.material = dullMaterial;
     }
@@ -40,7 +42,6 @@ public class LevelCrystal : MonoBehaviour
     {
         if (!isActivated || isCollected) return;
 
-        // Spin
         transform.Rotate(Vector3.up, spinSpeed * Time.deltaTime, Space.World);
     }
 
@@ -50,7 +51,6 @@ public class LevelCrystal : MonoBehaviour
 
         isActivated = true;
 
-        // 🔥 SWITCH MATERIAL HERE
         if (crystalRenderer != null && glowMaterial != null)
             crystalRenderer.material = glowMaterial;
 
@@ -73,13 +73,27 @@ public class LevelCrystal : MonoBehaviour
         transform.position = targetPos;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void CollectCrystal()
     {
         if (!isActivated || isCollected) return;
-        if (!other.CompareTag("Player")) return;
 
         isCollected = true;
 
-        SceneManager.LoadScene(nextSceneName);
+        Debug.Log("Crystal collected → loading scene");
+
+        if (!string.IsNullOrEmpty(nextSceneName))
+            SceneManager.LoadScene(nextSceneName);
+        else
+            Debug.LogError("Next scene name not set on crystal");
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+
+        Debug.Log("Player touched crystal");
+
+        if (levelManager != null)
+            levelManager.OnCrystalTouched();
     }
 }
