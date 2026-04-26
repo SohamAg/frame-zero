@@ -5,6 +5,9 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
+    [Header("Level Config")]
+    [SerializeField] private PlayerLevelConfig levelConfig;
+
     [Header("Equipment")]
     [SerializeField] private GameObject swordHand;
     [SerializeField] private GameObject swordBack;
@@ -86,7 +89,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         }
 
         jumpsRemaining = maxJumps;
-        SetEquipmentNormal();
+        ApplyDefaultEquipmentFromConfig();
     }
 
     private void FixedUpdate()
@@ -98,6 +101,12 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     private void HandleMovement()
     {
+        if (levelConfig != null && !levelConfig.canMove)
+        {
+            rb.linearVelocity = new Vector3(0f, rb.linearVelocity.y, 0f);
+            UpdateMovementAnimation();
+            return;
+        }
         float turnInput = moveInput.x;
         float forwardInput = moveInput.y;
 
@@ -147,6 +156,11 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     private void HandleJump()
     {
+        if (levelConfig != null && !levelConfig.canJump)
+        {
+            jumpPressed = false;
+            return;
+        }
         if (jumpPressed && jumpsRemaining > 0)
         {
             jumpsRemaining--;
@@ -205,6 +219,7 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (levelConfig != null && !levelConfig.canJump) return;
         if (context.performed)
         {
             jumpPressed = true;
@@ -213,6 +228,8 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     public void OnAttack(InputAction.CallbackContext context)
     {
+        if (levelConfig != null && !levelConfig.canAttack) return;
+
         if (context.performed)
         {
             animator?.SetTrigger(AttackHash);
@@ -221,6 +238,8 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
 
     public void OnCrouch(InputAction.CallbackContext context)
     {
+        if (levelConfig != null && !levelConfig.canBlock) return;
+
         bool isBlocking = context.ReadValueAsButton();
 
         animator?.SetBool(IsBlockingHash, isBlocking);
@@ -238,16 +257,20 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     // Q = Pickup
     public void OnPickup(InputAction.CallbackContext context)
     {
+        if (levelConfig != null && !levelConfig.canPickup) return;
         if (!context.performed) return;
 
         SetEquipmentOnBack();
         animator?.SetTrigger(PickupHash);
 
-        // cancel previous if spammed
+        if (levelConfig != null)
+        {
+            levelConfig.defaultSword = levelConfig.swordAfterPickup;
+            levelConfig.defaultShield = levelConfig.shieldAfterPickup;
+        }
+
         if (equipmentRoutine != null) StopCoroutine(equipmentRoutine);
         equipmentRoutine = StartCoroutine(ReturnEquipmentAfterDelay(2.4f));
-
-        // Add actual pickup detection/logic here later.
     }
 
     // F = Spell
@@ -255,49 +278,53 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     // and regenerate the C# class.
     public void OnCast(InputAction.CallbackContext context)
     {
-        if(!context.performed) return;
+        if (levelConfig != null && !levelConfig.canCast) return;
+        if (!context.performed) return;
 
         SetEquipmentOnBack();
         animator?.SetTrigger(CastSpellHash);
 
         if (equipmentRoutine != null) StopCoroutine(equipmentRoutine);
         equipmentRoutine = StartCoroutine(ReturnEquipmentAfterDelay(2.0f));
-
-        // Add projectile/spell spawning logic here later.
     }
 
     public void OnInteract(InputAction.CallbackContext context)
     {
+    }
 
-        if (context.performed)
-            animator?.SetTrigger(CastSpellHash);
+    private void ApplyDefaultEquipmentFromConfig()
+    {
+        if (levelConfig == null)
+        {
+            SetEquipment(EquipmentPlacement.Hand, EquipmentPlacement.Back);
+            return;
+        }
+
+        SetEquipment(levelConfig.defaultSword, levelConfig.defaultShield);
+    }
+
+    private void SetEquipment(EquipmentPlacement swordPlacement, EquipmentPlacement shieldPlacement)
+    {
+        if (swordHand != null) swordHand.SetActive(swordPlacement == EquipmentPlacement.Hand);
+        if (swordBack != null) swordBack.SetActive(swordPlacement == EquipmentPlacement.Back);
+
+        if (shieldHand != null) shieldHand.SetActive(shieldPlacement == EquipmentPlacement.Hand);
+        if (shieldBack != null) shieldBack.SetActive(shieldPlacement == EquipmentPlacement.Back);
     }
 
     public void SetEquipmentNormal()
     {
-        if (swordHand != null) swordHand.SetActive(true);
-        if (swordBack != null) swordBack.SetActive(false);
-
-        if (shieldHand != null) shieldHand.SetActive(false);
-        if (shieldBack != null) shieldBack.SetActive(true);
+        ApplyDefaultEquipmentFromConfig();
     }
 
     public void SetEquipmentBlock()
     {
-        if (swordHand != null) swordHand.SetActive(false);
-        if (swordBack != null) swordBack.SetActive(true);
-
-        if (shieldHand != null) shieldHand.SetActive(true);
-        if (shieldBack != null) shieldBack.SetActive(false);
+        SetEquipment(EquipmentPlacement.Back, EquipmentPlacement.Hand);
     }
 
     public void SetEquipmentOnBack()
     {
-        if (swordHand != null) swordHand.SetActive(false);
-        if (swordBack != null) swordBack.SetActive(true);
-
-        if (shieldHand != null) shieldHand.SetActive(false);
-        if (shieldBack != null) shieldBack.SetActive(true);
+        SetEquipment(EquipmentPlacement.Back, EquipmentPlacement.Back);
     }
 
     public void OnLook(InputAction.CallbackContext context) { }
@@ -309,7 +336,9 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     {
         if (other.CompareTag("Lava"))
         {
-            transform.position = new Vector3(95.1f, 2.5f, 164.9f);
+            transform.position = levelConfig != null
+                ? levelConfig.respawnPosition
+                : new Vector3(95.1f, 2.5f, 164.9f);
             rb.linearVelocity = Vector3.zero;
         }
 
