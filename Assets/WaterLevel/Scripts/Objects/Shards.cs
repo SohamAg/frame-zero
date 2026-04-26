@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class Crystal : MonoBehaviour
+public class Shards : MonoBehaviour
 {
-    [Header("Crystal Settings")]
+    [Header("Shard Settings")]
     public int maxHealth = 3;
     private int currentHealth;
 

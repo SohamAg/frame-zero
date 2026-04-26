@@ -8,8 +8,8 @@ public class NPCTextTrigger : MonoBehaviour
 
     private InventoryManager inventory;
 
-    // Crystal spawning
-    public GameObject crystalPrefab;
+
+    public GameObject crystalInScene;
     public Transform crystalSpawnPoint;
 
     // Win Canvas
@@ -71,21 +71,14 @@ public class NPCTextTrigger : MonoBehaviour
 
             inventory.AddItem("Potion");
 
-            // Spawn crystal at spawn point
-            if (crystalPrefab != null && crystalSpawnPoint != null)
+            if (crystalInScene != null)
             {
-                GameObject crystal = Instantiate(crystalPrefab, crystalSpawnPoint.position, Quaternion.identity);
-
-                CrystalPickup cp = crystal.GetComponent<CrystalPickup>();
-                if (cp != null)
-                {
-                    cp.winCanvas = winCanvas;
-                }
+                crystalInScene.SetActive(true);
             }
         }
         else
         {
-            questionText.text = "Wizard: You don’t have enough fish yet!";
+            questionText.text = "Wizard: You don’t have enough items yet!";
         }
     }
 }
