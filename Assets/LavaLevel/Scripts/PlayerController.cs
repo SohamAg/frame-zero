@@ -9,6 +9,10 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     [SerializeField] private GameObject swordBack;
     [SerializeField] private GameObject shieldHand;
     [SerializeField] private GameObject shieldBack;
+    private Vector2 smoothedMoveInput;
+    [SerializeField] private float animationSmoothTime = 12f;
+    [SerializeField] private float acceleration = 60f;
+    [SerializeField] private float deceleration = 100f;
 
     [Header("Movement")]
     public float moveSpeed = 6f;
@@ -95,15 +99,19 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
         if (moveDirection.magnitude > 1f)
             moveDirection.Normalize();
 
-        // Apply velocity
-        Vector3 velocity = moveDirection * moveSpeed;
-        velocity.y = rb.linearVelocity.y;
-        rb.linearVelocity = velocity;
+        Vector3 targetVelocity = moveDirection * moveSpeed;
 
-        // 🔥 FIX: Character faces camera, NOT movement
+        rb.linearVelocity = new Vector3(
+            targetVelocity.x,
+            rb.linearVelocity.y,
+            targetVelocity.z
+        );
+
+        // Rotate only when moving
         if (moveDirection.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
                 targetRotation,
@@ -118,10 +126,14 @@ public class PlayerController : MonoBehaviour, InputSystem_Actions.IPlayerAction
     {
         if (animator == null) return;
 
-        Vector2 normalizedInput = moveInput.normalized;
+        smoothedMoveInput = Vector2.Lerp(
+        smoothedMoveInput,
+        moveInput.normalized,
+        animationSmoothTime * Time.deltaTime
+        );
 
-        animator.SetFloat(MoveXHash, normalizedInput.x, 0.1f, Time.deltaTime);
-        animator.SetFloat(MoveYHash, normalizedInput.y, 0.1f, Time.deltaTime);
+        animator.SetFloat(MoveXHash, smoothedMoveInput.x, 0.12f, Time.deltaTime);
+        animator.SetFloat(MoveYHash, smoothedMoveInput.y, 0.12f, Time.deltaTime);
         animator.SetBool(IsGroundedHash, isGrounded);
     }
 
