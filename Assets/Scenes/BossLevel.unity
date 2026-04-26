@@ -921,6 +921,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4957605393579145644, guid: 4f46098734d87e24490aef9267915ad2, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 4957605393579145646, guid: 4f46098734d87e24490aef9267915ad2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2056,6 +2060,7 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   potionHeal: 20
+  healthBar: {fileID: 1152529130}
 --- !u!114 &939536294
 MonoBehaviour:
   m_ObjectHideFlags: 0

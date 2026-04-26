@@ -31,19 +31,19 @@ public class MonsterAI : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, player.position);
 
-        // 🔹 FAR → IDLE
+
         if (distance > sightRange)
         {
             agent.SetDestination(transform.position);
             animator.SetFloat("Speed", 0);
         }
-        // 🔹 MID → CHASE (walk/run)
+
         else if (distance > attackRange)
         {
             agent.SetDestination(player.position);
             animator.SetFloat("Speed", agent.velocity.magnitude);
         }
-        // 🔹 CLOSE → ATTACK
+
         else
         {
             agent.SetDestination(transform.position);
@@ -51,7 +51,7 @@ public class MonsterAI : MonoBehaviour
 
             if (Time.time >= lastAttackTime + attackCooldown)
             {
-                // random attack (if you have multiple)
+
                 int attackType = Random.Range(1, 4);
 
                 if (attackType == 1)
